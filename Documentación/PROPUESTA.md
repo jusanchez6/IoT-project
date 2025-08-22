@@ -15,7 +15,7 @@ Actualmente en el mundo ciclista se usan una cantidad sin fin de dispositivos pa
 En este contexto este proyecto apunta a la creación de un localizador GPS para bicicleta y/o vehículos basados en el ESP32 personalizables y barato en comparativa con los demás dispositivos presentes en el mercado. Este dispositivo se conecta a la red mediante hotspot de celular, mostrando datos en una interfaz alojada en la nube. Además de la funcionalidad de alertas por exceso de velocidad segura (definida por el usuario -estática- o por la localización del mismo -dinámica-). El equipo pretende incluir LEDs de estado (Conectividad y GPS) y alimentación por batería recargable con modula de carga USB-C.
 
 ---
-# 2. OBJETIVOS
+## 2. OBJETIVOS
 
 **1. Telemetria:** Capturar y almacenar posición (Latitud y Longitud), velocidad y rumbo de 1-5Hz
 
@@ -32,7 +32,7 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 **6. Energía:** Autonomía objetivo de 10-24 h (modo bici) con batería de polímero de Litio y carga mediante modulo USB-C
 
 ---
-# 3. ALCANCES
+## 3. ALCANCES
 
 - Hardware prototipo funcional en placa perforada o PCB simple.
 - Empaquetado en una estructura impresa en 3D.
@@ -40,7 +40,7 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - Backend con MQTT + Grafana para visualización histórica
 - Documentación de ensamblaje, pin-out, esquemas lógicos, guías de uso y pruebas.
 ---
-# 4. REQUISITOS FUNCIONALES
+## 4. REQUISITOS FUNCIONALES
 
 1. **Adquisición:** El sistema debe estar en la capacidad de obtener datos de longitud, latitud, velocidad y angulo de inclinación
 
@@ -55,11 +55,11 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 6. **Gestión energía**: El sistema debe contar con una bateria y un modulo de carga, además de contar con modos de deep sleep por inactividad (sin movimiento) con wake por IMU.
 
 ---
-# 5. ARQUITECTURA DEL PROYECTO:
+## 5. ARQUITECTURA DEL PROYECTO:
 
 
 ---
-# 6. CRONOGRAMA DE INTEGRACIÓN DEL PROYECTO
+## 6. CRONOGRAMA DE INTEGRACIÓN DEL PROYECTO
 
 ### Fase 1 – Preparación y diseño (Semanas 1–3)
 
