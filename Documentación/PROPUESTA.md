@@ -37,6 +37,7 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - Hardware prototipo funcional en placa perforada o PCB simple.
 - Empaquetado en una estructura impresa en 3D.
 - Firmware escrito en ESP-IDF/ARDUINO (C/C++) con cliente WiFi y drivers (GPS/IMU/LEDs/BUZZER)
+- Capacidad de elección entre código enfocado un superLoop (Baremetal) o RTOS (FreeRTOS)
 - Backend con MQTT + Grafana para visualización histórica
 - Documentación de ensamblaje, pin-out, esquemas lógicos, guías de uso y pruebas.
 ---
@@ -129,3 +130,15 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
     - Documentación técnica (manual de usuario + guía de integración).
     - Preparación de presentación final y video demo.
 - **13 de diciembre:** **Entrega final del proyecto.**
+
+
+# 7. LISTA DE MATERIALES Y PRESUPUESTO ESTIMADO.
+
+- **ESP32‑WROOM‑32:** $ 39.000 [ESP32](https://www.mactronica.com.co/tarjeta-de-desarrollo-esp32-s3-n16r8)
+- **Módulo Gps Gy Neo6mv2 Eeprom U-blox con antena**: $ 38.000 [GPS](https://articulo.mercadolibre.com.co/MCO-834505267-modulo-gps-gy-neo6mv2-eeprom-u-blox-_JM?matt_tool=19390127)    
+- **MPU6050 9 Axis:** $ 11.900 [IMU](https://electronilab.co/tienda/mpu6050-acelerometro-y-giroscopio-i2c/)
+- **Cargador USB‑C (TP4056/):** $ 5.000 [CARGADOR](https://electronilab.co/tienda/modulo-cargador-bateria-de-lipo-1a-usb-c-5v-tp4056/)    
+- **Batería litio polímero 2000 mAh 3.7V BATLIPO20001S:** $ 23.978,50 [Bateria](https://www.didacticaselectronicas.com/shop/585460-3-7-2000ma-bateria-litio-polimero-2000-mah-3-7v-batlipo20001s-1934#attr=6020,6021,6022,6023,6024,6025,6026)
+- **Misceláneos (LEDs, buzzer, PCB, conectores, caja):** $ 20.000 
+
+**Total estimado:** $ 138.000
