@@ -4,7 +4,7 @@ tags:
   - IoT
   - Proyecto_final
 date: 22/08/2025
-Integrantes: Julian Sanchez, Danilo, Cesar
+Integrantes: Julian Sanchez, Danilo, César
 ---
 # Localizador GPS para Vehículos/Bicicletas con ESP32, GPS, IMU, hotspot del celular, LEDs de estado y buzzer por exceso de velocidad
 
