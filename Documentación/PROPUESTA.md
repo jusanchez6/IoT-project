@@ -130,8 +130,6 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
     - Documentación técnica (manual de usuario + guía de integración).
     - Preparación de presentación final y video demo.
 - **13 de diciembre:** **Entrega final del proyecto.**
-<<<<<<< HEAD
-
 
 # 7. LISTA DE MATERIALES Y PRESUPUESTO ESTIMADO.
 
@@ -144,4 +142,3 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 
 **Total estimado:** $ 138.000
 =======
->>>>>>> bbfec84744fe213f81d5cbe4272133da20192f8f
