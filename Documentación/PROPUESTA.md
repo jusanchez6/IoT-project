@@ -12,7 +12,7 @@ Integrantes: Julian Sanchez, Danilo, César
 
 Actualmente en el mundo ciclista se usan una cantidad sin fin de dispositivos para realizar métricas de movimiento (Velocidades y coordenadas) sin embargo estos dispositivos cuentan con limitaciones, en ocasiones impuestas por el mismo fabricante, que hace que algunos dispositivos sean muy básicos, poco personalizables y en muchas ocasiones costosos. 
 
-En este contexto este proyecto apunta a la creación de un localizador GPS para bicicleta y/o vehículos basados en el ESP32 personalizables y barato en comparativa con los demás dispositivos presentes en el mercado. Este dispositivo se conecta a la red mediante hotspot de celular, mostrando datos en una interfaz alojada en la nube. Además de la funcionalidad de alertas por exceso de velocidad segura (definida por el usuario -estática- o por la localización del mismo -dinámica-). El equipo pretende incluir LEDs de estado (Conectividad y GPS) y alimentación por batería recargable con modula de carga USB-C.
+En este contexto este proyecto apunta a la creación de un localizador GPS para bicicleta y/o vehículos basados en el ESP32 personalizables y barato en comparativa con los demás dispositivos presentes en el mercado. Este dispositivo se conecta a la red mediante hotspot de celular, mostrando datos en una interfaz alojada en la nube. Además de la funcionalidad de alertas por exceso de velocidad segura (definida por el usuario -estática- o por la localización del mismo -dinámica-). El equipo pretende incluir LEDs de estado (Conectividad y GPS) y alimentación por batería recargable con modula de carga USB-C, y configuración por este mismo al conectarse al teléfono mediante una aplicación.
 
 ---
 ## 2. OBJETIVOS
@@ -25,7 +25,7 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - Dashboard interactivo en el celular o pagina web con datos de velocidad por trayecto e historial de ubicaciones.
 - Envío a un broker mediante MQTT por túnel TLS para consultas remotas.
 
-**4. Seguridad y sistemas de alertas:** Mediante un buzzer indicando cuando la velocidad supera el limite estimado para la via o por un valor fijado por el usuario de moto estático.
+**4. Seguridad y sistemas de alertas:** Mediante un buzzer indicando cuando la velocidad supera el limite estimado para la via o por un valor fijado por el usuario desde la configuración por la aplicación móvil.
 
 **5. Estados visibles por medio de LEDs:** LEDs de distintos colores indicando si el GPS se encuentra obteniendo datos, si el dispositivo esta conectado a una red WiFi valida.
 
@@ -91,8 +91,10 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 
 - **Semana 7 (3–9 oct):**
     - Implementar Wi-Fi STA → conexión a hotspot del celular.
+    - Hacer pruebas de estabilidad de conexión para diversos escenarios de uso.
     - Rutinas de reconexión automática.
 - **Semana 8 (10–16 oct):**
+    - Diseño y prueba de mensajes Pub/Sub para los clientes MQTT, incluyendo estructura de datos (JSON).
     - Pruebas de envío de datos a la nube (MQTT/HTTP simple).
     - Buffer en memoria/flash cuando no haya Internet.
 - **Semana 9 (17–23 oct):**
@@ -130,8 +132,6 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
     - Documentación técnica (manual de usuario + guía de integración).
     - Preparación de presentación final y video demo.
 - **13 de diciembre:** **Entrega final del proyecto.**
-<<<<<<< HEAD
-
 
 # 7. LISTA DE MATERIALES Y PRESUPUESTO ESTIMADO.
 
@@ -144,4 +144,3 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 
 **Total estimado:** $ 138.000
 =======
->>>>>>> bbfec84744fe213f81d5cbe4272133da20192f8f
