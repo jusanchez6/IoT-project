@@ -24,12 +24,13 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 **3. Visualización:** 
 - Dashboard interactivo en el celular o pagina web con datos de velocidad por trayecto e historial de ubicaciones.
 - Envío a un broker mediante MQTT por túnel TLS para consultas remotas.
+- Registro de eventos en el celular o pagina web (excesos de velocidad, fallos de conectividad, etc.)
 
 **4. Seguridad y sistemas de alertas:** Mediante un buzzer indicando cuando la velocidad supera el limite estimado para la via o por un valor fijado por el usuario desde la configuración por la aplicación móvil.
 
 **5. Estados visibles por medio de LEDs:** LEDs de distintos colores indicando si el GPS se encuentra obteniendo datos, si el dispositivo esta conectado a una red WiFi valida.
 
-**6. Energía:** Autonomía objetivo de 10-24 h (modo bici) con batería de polímero de Litio y carga mediante modulo USB-C
+**6. Energía:** Autonomía objetivo de 10-24 h (modo bici) con batería de polímero de Litio y carga mediante modulo USB-C.
 
 ---
 ## 3. ALCANCES
@@ -39,7 +40,9 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - Firmware escrito en ESP-IDF/ARDUINO (C/C++) con cliente WiFi y drivers (GPS/IMU/LEDs/BUZZER)
 - Capacidad de elección entre código enfocado un superLoop (Baremetal) o RTOS (FreeRTOS)
 - Backend con MQTT + Grafana para visualización histórica
+- MVP del Software de usuario (aplicación web o aplicación móvil).
 - Documentación de ensamblaje, pin-out, esquemas lógicos, guías de uso y pruebas.
+- Documentación de la estructura y arquitectura de las aplicaciones web o aplicación móvil desarrollada.
 ---
 ## 4. REQUISITOS FUNCIONALES
 
@@ -58,6 +61,21 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 ---
 ## 5. ARQUITECTURA DEL PROYECTO:
 
+Buscando cumplir con los estándares de calidad de sistemas de información definidos por las normas ISO 25010, se desarrollarán diferentes estructuras que sean desacopladas y modulares en las etapas que constituyen el proyecto.
+### 5.1. Modelo de Domino del sistema
+Desde una perspectiva general del sistema, se busca que el usuario final pueda interactuar con el sistema mediante una aplicación de software, tal que se cumpla un modelo como el siguiente:
+![[Diagrama del modelo de dominio.png]]
+
+### 5.2. Mockup de la aplicación
+Para el desarrollo de la aplicación se realizó el siguiente mockup, que determina el concepto general diseñado para la interfaz de usuario.
+
+![[App mockup.png]]
+
+### 5.3. Patrón de desarrollo 
+El patrón de desarrollo que se utilizará para la comunicación de los datos corresponde al modelo Publicador-Subscriptor, tal que se facilitará el intercambio asincrónico de los datos.
+
+![[PubSubImage.png]]
+
 
 ---
 ## 6. CRONOGRAMA DE INTEGRACIÓN DEL PROYECTO
@@ -67,24 +85,30 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - **Semana 1 (22–28 ago):**
     - Definir requisitos detallados del sistema (entradas, salidas, alcance).
     - Establecer diagrama de bloques y arquitectura (hardware + software).
+    -  Creación del mockup de la aplicación.
 - **Semana 2 (29 ago–4 sep):**
     - Selección y compra de componentes (ESP32, GPS, IMU, LEDs, buzzer, batería, cargador USB-C).
     - Investigación de librerías disponibles (ESP-IDF / Arduino para GPS, Wi-Fi, IMU).
+    - Definición de la arquitectura y los patrones de diseño de la aplicación.
 - **Semana 3 (5–11 sep):**
     - Diseño preliminar de firmware (tareas FreeRTOS, drivers básicos).
     - Montaje inicial de módulos en protoboard.
+    - Desarrollo de la aplicación.
 
 ---
 ### Fase 2 – Integración de hardware y drivers (Semanas 4–6)
 
 - **Semana 4 (12–18 sep):**    
     - Integración ESP32 ↔ GPS (lectura NMEA, velocidad y coordenadas).
+    - Desarrollo de la aplicación.
 - **Semana 5 (19–25 sep):**
     - Integración ESP32 ↔ IMU (lectura básica de acelerómetro/giroscopio).
     - Pruebas de datos combinados GPS + IMU.
+    - Desarrollo de la aplicación.
 - **Semana 6 (26 sep–2 oct):**
     - Integración LEDs (conectividad, estado GPS).
     - Integración buzzer (alertas PWM).
+    - Desarrollo de la aplicación.
 
 ---
 ### Fase 3 – Conectividad y almacenamiento (Semanas 7–9)
@@ -93,10 +117,12 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
     - Implementar Wi-Fi STA → conexión a hotspot del celular.
     - Hacer pruebas de estabilidad de conexión para diversos escenarios de uso.
     - Rutinas de reconexión automática.
+    - Implementar conexión de la aplicación a la nube.
 - **Semana 8 (10–16 oct):**
     - Diseño y prueba de mensajes Pub/Sub para los clientes MQTT, incluyendo estructura de datos (JSON).
     - Pruebas de envío de datos a la nube (MQTT/HTTP simple).
     - Buffer en memoria/flash cuando no haya Internet.
+    - Pruebas de intercambio de datos entre el software y la nube.
 - **Semana 9 (17–23 oct):**
     - Pruebas de almacenamiento y reenvío de datos tras reconexión.
 
@@ -109,6 +135,7 @@ En este contexto este proyecto apunta a la creación de un localizador GPS para 
 - **Semana 11 (31 oct–6 nov):**
     - Integración de mapa (Leaflet) en la interfaz web.
     - Visualización de posición en tiempo real.
+    - Pruebas de recolección de datos enviados por sensores en la aplicación.
 - **Semana 12 (7–13 nov):**
     - Panel de control web (estado Wi-Fi, umbral de velocidad, batería).
     - Pruebas con datos en vivo.
