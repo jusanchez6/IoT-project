@@ -83,46 +83,46 @@ El patrón de desarrollo que se utilizará para la comunicación de los datos co
 ### Fase 1 – Preparación y diseño (Semanas 1–3)
 
 - **Semana 1 (22–28 ago):**
-    - Definir requisitos detallados del sistema (entradas, salidas, alcance).
-    - Establecer diagrama de bloques y arquitectura (hardware + software).
-    -  Creación del mockup de la aplicación.
+    - [x] Definir requisitos detallados del sistema (entradas, salidas, alcance).
+    - [ ] Establecer diagrama de bloques y arquitectura (hardware + software).
+    - [x]  Creación del mockup de la aplicación.
 - **Semana 2 (29 ago–4 sep):**
-    - Selección y compra de componentes (ESP32, GPS, IMU, LEDs, buzzer, batería, cargador USB-C).
-    - Investigación de librerías disponibles (ESP-IDF / Arduino para GPS, Wi-Fi, IMU).
-    - Definición de la arquitectura y los patrones de diseño de la aplicación.
+    - [ ] Selección y compra de componentes (ESP32, GPS, IMU, LEDs, buzzer, batería, cargador USB-C).
+    - [x] Investigación de librerías disponibles (ESP-IDF / Arduino para GPS, Wi-Fi, IMU).
+    - [ ] Definición de la arquitectura y los patrones de diseño de la aplicación.
 - **Semana 3 (5–11 sep):**
-    - Diseño preliminar de firmware (tareas FreeRTOS, drivers básicos).
-    - Montaje inicial de módulos en protoboard.
-    - Desarrollo de la aplicación.
+    - [ ] Diseño preliminar de firmware (tareas FreeRTOS, drivers básicos).
+    - [ ] Montaje inicial de módulos en protoboard.
+    - [ ] Desarrollo de la aplicación.
 
 ---
 ### Fase 2 – Integración de hardware y drivers (Semanas 4–6)
 
 - **Semana 4 (12–18 sep):**    
-    - Integración ESP32 ↔ GPS (lectura NMEA, velocidad y coordenadas).
-    - Desarrollo de la aplicación.
+    - [ ] Integración ESP32 ↔ GPS (lectura NMEA, velocidad y coordenadas).
+    - [ ] Desarrollo de la aplicación.
 - **Semana 5 (19–25 sep):**
-    - Integración ESP32 ↔ IMU (lectura básica de acelerómetro/giroscopio).
-    - Pruebas de datos combinados GPS + IMU.
-    - Desarrollo de la aplicación.
+    - [x] Integración ESP32 ↔ IMU (lectura básica de acelerómetro/giroscopio).
+    - [ ] Pruebas de datos combinados GPS + IMU.
+    - [ ] Desarrollo de la aplicación.
 - **Semana 6 (26 sep–2 oct):**
-    - Integración LEDs (conectividad, estado GPS).
-    - Integración buzzer (alertas PWM).
-    - Desarrollo de la aplicación.
+    - [ ] Integración LEDs (conectividad, estado GPS).
+    - [ ] Integración buzzer (alertas PWM).
+    - [ ] Desarrollo de la aplicación.
 
 ---
 ### Fase 3 – Conectividad y almacenamiento (Semanas 7–9)
 
 - **Semana 7 (3–9 oct):**
-    - Implementar Wi-Fi STA → conexión a hotspot del celular.
-    - Hacer pruebas de estabilidad de conexión para diversos escenarios de uso.
-    - Rutinas de reconexión automática.
-    - Implementar conexión de la aplicación a la nube.
+    - [ ] Implementar Wi-Fi STA → conexión a hotspot del celular.
+    - [ ] Hacer pruebas de estabilidad de conexión para diversos escenarios de uso.
+    - [ ] Rutinas de reconexión automática.
+    - [ ] Implementar conexión de la aplicación a la nube.
 - **Semana 8 (10–16 oct):**
-    - Diseño y prueba de mensajes Pub/Sub para los clientes MQTT, incluyendo estructura de datos (JSON).
-    - Pruebas de envío de datos a la nube (MQTT/HTTP simple).
-    - Buffer en memoria/flash cuando no haya Internet.
-    - Pruebas de intercambio de datos entre el software y la nube.
+    - [ ] Diseño y prueba de mensajes Pub/Sub para los clientes MQTT, incluyendo estructura de datos (JSON).
+    - [ ] Pruebas de envío de datos a la nube (MQTT/HTTP simple).
+    - [ ] Buffer en memoria/flash cuando no haya Internet.
+    - [ ] Pruebas de intercambio de datos entre el software y la nube.
 - **Semana 9 (17–23 oct):**
     - Pruebas de almacenamiento y reenvío de datos tras reconexión.
 
@@ -130,44 +130,50 @@ El patrón de desarrollo que se utilizará para la comunicación de los datos co
 ### Fase 4 – Interfaz y visualización (Semanas 10–12)
 
 - **Semana 10 (24–30 oct):**
-    - Servidor web local en ESP32.
-    - API REST para exponer coordenadas y velocidad.
+    - [ ] Servidor web local en ESP32.
+    - [ ] API REST para exponer coordenadas y velocidad.
 - **Semana 11 (31 oct–6 nov):**
-    - Integración de mapa (Leaflet) en la interfaz web.
-    - Visualización de posición en tiempo real.
-    - Pruebas de recolección de datos enviados por sensores en la aplicación.
+    - [ ] Integración de mapa (Leaflet) en la interfaz web.
+    - [ ] Visualización de posición en tiempo real.
+    - [ ] Pruebas de recolección de datos enviados por sensores en la aplicación.
 - **Semana 12 (7–13 nov):**
-    - Panel de control web (estado Wi-Fi, umbral de velocidad, batería).
-    - Pruebas con datos en vivo.
+    - [ ] Panel de control web (estado Wi-Fi, umbral de velocidad, batería).
+    - [ ] Pruebas con datos en vivo.
 
 ---
 ### Fase 5 – Integración total y pruebas (Semanas 13–15)
 
 - **Semana 13 (14–20 nov):**
-    - Integración completa del sistema (GPS + IMU + LEDs + buzzer + Wi-Fi + interfaz).
-    - Ajustes de consumo y autonomía con batería.
+    - [ ] Integración completa del sistema (GPS + IMU + LEDs + buzzer + Wi-Fi + interfaz).
+    - [ ] Ajustes de consumo y autonomía con batería.
 - **Semana 14 (21–27 nov):**
-    - Pruebas de campo (bicicleta/vehículo).
-    - Verificación de alertas por exceso de velocidad.
+    - [ ] Pruebas de campo (bicicleta/vehículo).
+    - [ ] Verificación de alertas por exceso de velocidad.
 - **Semana 15 (28 nov–4 dic):**
-    - Corrección de errores y mejoras (reconexión Wi-Fi, precisión GPS).
+    - [ ] Corrección de errores y mejoras (reconexión Wi-Fi, precisión GPS).
 
 ---
 ### Fase 6 – Entrega final (Semana 16)
 
 - **Semana 16 (5–11 dic):**    
-    - Documentación técnica (manual de usuario + guía de integración).
-    - Preparación de presentación final y video demo.
+    - [ ] Documentación técnica (manual de usuario + guía de integración).
+    - [ ] Preparación de presentación final y video demo.
 - **13 de diciembre:** **Entrega final del proyecto.**
 
 # 7. LISTA DE MATERIALES Y PRESUPUESTO ESTIMADO.
 
-- **ESP32‑WROOM‑32:** $ 39.000 [ESP32](https://www.mactronica.com.co/tarjeta-de-desarrollo-esp32-s3-n16r8)
+- **ESP32‑WROOM‑32:** $ 39.000 [ESP32](https://www.mactronica.com.co/tarjeta-de-desarrollo-esp32-s3-n16r8) 
+	- [x] comprado 
 - **Módulo Gps Gy Neo6mv2 Eeprom U-blox con antena**: $ 38.000 [GPS](https://articulo.mercadolibre.com.co/MCO-834505267-modulo-gps-gy-neo6mv2-eeprom-u-blox-_JM?matt_tool=19390127)    
+	- [ ] comprado
 - **MPU6050 9 Axis:** $ 11.900 [IMU](https://electronilab.co/tienda/mpu6050-acelerometro-y-giroscopio-i2c/)
+	- [x] comprado
 - **Cargador USB‑C (TP4056/):** $ 5.000 [CARGADOR](https://electronilab.co/tienda/modulo-cargador-bateria-de-lipo-1a-usb-c-5v-tp4056/)    
+	- [ ] comprado
 - **Batería litio polímero 2000 mAh 3.7V BATLIPO20001S:** $ 23.978,50 [Bateria](https://www.didacticaselectronicas.com/shop/585460-3-7-2000ma-bateria-litio-polimero-2000-mah-3-7v-batlipo20001s-1934#attr=6020,6021,6022,6023,6024,6025,6026)
+	- [ ] comprado
 - **Misceláneos (LEDs, buzzer, PCB, conectores, caja):** $ 20.000 
-
+	- [ ] comprado
+	
 **Total estimado:** $ 138.000
 =======
