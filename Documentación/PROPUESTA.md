@@ -6,7 +6,7 @@ tags:
 date: 22/08/2025
 Integrantes: Julian Sanchez, Danilo, César Augusto Montoya Ocampo
 ---
-
+	
 # Localizador GPS para Vehículos/Bicicletas con ESP32, GPS, IMU, hotspot del celular, LEDs de estado y buzzer por exceso de velocidad
 
 ## 1. PROBLEMA Y MOTIVACIÓN
@@ -168,6 +168,12 @@ La solución contempla además escenarios de comunicación directa entre máquin
 - El **broker MQTT** reenvía automáticamente la información a múltiples suscriptores (por ejemplo, la aplicación web y otros sistemas de análisis).
 - En modo offline, el **ESP32 y la microSD** interactúan de forma autónoma para almacenar datos que luego serán transmitidos de manera automática al servidor en cuanto se restablezca la conectividad.
 - De manera inmediata y autónoma, el **ESP32 activa el buzzer** cuando detecta condiciones críticas (exceso de velocidad o inclinación), incluso si no existe conectividad a red.
+
+### 5.6. Stack tecnológico para el desarrollo de la aplicación
+
+Para el desarrollo de la aplicación se utilizará Kotlin + Firebase, tal que el primero se utilizara para el desarrollo de la aplicación móvil mientras que el segundo funcionará como back-end y base de datos para el conjunto de servicios requeridos durante el funcionamiento del sistema.
+
+La razón para el uso de este conjunto de tecnologías corresponde a la existencia de compatibilidad y la facilidad de desarrollo en la integración.
 
 ---
 
