@@ -1,3 +1,18 @@
+/**
+ * @file imu.hpp
+ * @brief Implementación de la clase IMU para adquisición y procesamiento de datos del sensor MPU6050.
+ *
+ * Esta librería proporciona una interfaz para inicializar, configurar y procesar datos de un
+ * acelerómetro MPU6050 usando la librería Adafruit. Incluye filtrado de datos, estimación de
+ * velocidad con integración de la aceleración y filtrado mediante Kalman y media móvil.
+ * 
+ * @author Julian Sanchez
+ * @date 12/09/2025
+ * @version 1.0
+ * 
+ */
+
+
 #include <imu.hpp>
 
 IMU::IMU() : lastTime(0), P(1.0f), Q(0.01f), R(0.8f), K(0.0f),
