@@ -95,6 +95,13 @@ public:
      */
     String localTime(int offsetHours = BOGOTA_UTC);
 
+    /**
+     * @brief Obtiene la velocidad en Km/h
+     * 
+     * @return La velocidad en km/h, o "Invalid" si no hay datos válidos.
+     */
+    double velocity () {return gps.speed.isValid() ? gps.speed.kmph() : NAN;}
+
 private:
     HardwareSerial &gnssSerial; ///< Referencia al puerto serial usado por el GNSS.
     TinyGPSPlus gps;            ///< Instancia de TinyGPSPlus para decodificación NMEA.

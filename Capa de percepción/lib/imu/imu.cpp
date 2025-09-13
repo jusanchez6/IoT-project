@@ -68,6 +68,12 @@ void IMU::update() {
   // Aceleración filtrada
   accX = moving_average(a.acceleration.x);
 
+  if (accX <= 1 && accX >= -1)
+  {
+    accX = 0.0; // umbral para evitar ruido
+  }
+
+
   // Estimación por integración trapezoidal
   estimate_velocity_imu(&imu_data, accX, dt);
   vel_measured = imu_data.velocity;

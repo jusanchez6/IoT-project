@@ -5,6 +5,7 @@
 #include <gnss.hpp>
 #include <wifi_funcs.hpp>
 #include <imu.hpp>
+#include <platform.hpp>
 
 // ======== GNSS =============
 
@@ -21,6 +22,10 @@ String password;
 // ===== IMU =====
 IMU imu;
 
+
+// ==== LED =====
+
+LED led(1, 48);
 void setup()
 {
   Serial.begin(115200);
@@ -45,7 +50,7 @@ void setup()
 
   if (!imu.begin(&Wire, 0x68)) {
     Serial.println("Error. No se pudo encontrar un MPU6050 valido.");
-    while (true);
+    while(true);
   }
   Serial.println("MPU6050 OK");
 }
@@ -70,9 +75,11 @@ void loop()
     Serial.print("Lng: "); Serial.println(gnss.longitude(), 6);
     Serial.print("Alt: "); Serial.println(gnss.altitude());
     Serial.print("Hora local: "); Serial.println(gnss.localTime(-5));
+    Serial.print("Velocidad [km/h]: "); Serial.println(gnss.velocity());
     Serial.println("----------------------------");
   }
 
+  led.setColor(COLOR_PINK);
 
   delay(200);
   
