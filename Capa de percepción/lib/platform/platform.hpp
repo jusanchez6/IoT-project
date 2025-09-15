@@ -4,6 +4,12 @@
  *
  * Este archivo define macros de colores preestablecidos y clases que encapsulan
  * el control de hardware como LEDs RGB, alarmas acústicas y gestión de batería.
+ * 
+ * 
+ * @author Julian Sanchez
+ * @date 15/09/2025
+ * 
+ * @version 1.0
  */
 
 #ifndef PLATFORM_HPP
@@ -13,10 +19,10 @@
 #include <Adafruit_NeoPixel.h>
 
 // ====== Colores básicos ======
-#define COLOR_RED       0x000000FF  ///< Rojo intenso
-#define COLOR_GREEN     0x0000FF00  ///< Verde intenso
-#define COLOR_BLUE      0x00FF0000  ///< Azul intenso
-#define COLOR_WHITE     0x00FFFFFF  ///< Blanco
+#define COLOR_RED       0x00000077  ///< Rojo intenso
+#define COLOR_GREEN     0x00007700  ///< Verde intenso
+#define COLOR_BLUE      0x00770000  ///< Azul intenso
+#define COLOR_WHITE     0x00777777  ///< Blanco
 #define BLACK           0x00000000  ///< Negro
 
 // ====== Variantes ======
@@ -99,6 +105,9 @@ private:
     uint8_t alarmPin;     ///< Pin conectado al buzzer.
     bool alarmState = false; ///< Estado actual de la alarma.
 };
+
+
+// ============== UNDER CONSTRUCTION =================================
 
 /**
  * @class BATTERY
