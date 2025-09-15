@@ -14,66 +14,68 @@
  *
  * @author Julián Sánchez
  * @date 15/09/2025
- *
  * @version 1.01
- *
  */
 
-// Librerias estandar
 #include <Arduino.h>
 #include <Wire.h>
 
-// Librerias
 #include <gnss.hpp>
 #include <wifi_funcs.hpp>
 #include <imu.hpp>
 #include <platform.hpp>
 
+/**
+ * @struct SensorData
+ * @brief Estructura para almacenar datos de GNSS e IMU.
+ */
 struct SensorData
 {
-  float latitude;
-  float longitude;
-  float altitude;
-  float velocity;
-  bool gnssReady;
+  float latitude;     ///< Latitud actual [grados]
+  float longitude;    ///< Longitud actual [grados]
+  float altitude;     ///< Altitud actual [m]
+  float velocity;     ///< Velocidad GNSS [km/h]
+  bool gnssReady;     ///< Estado de GNSS (true = fix disponible)
 
-  float accX;
-  float velMeasured;
-  float velKalman;
+  float accX;         ///< Aceleración en eje X [m/s^2]
+  float velMeasured;  ///< Velocidad integrada [m/s]
+  float velKalman;    ///< Velocidad filtrada con Kalman [m/s]
 };
 
-SensorData sensorData;
-SemaphoreHandle_t dataMutex; // Para proteger acceso concurrente
+SensorData sensorData;              ///< Variable global con los datos del sistema
+SemaphoreHandle_t dataMutex;        ///< Mutex para proteger acceso concurrente a sensorData
 
 // ======== GNSS =============
-
 #define RX_PIN 17      ///< GPIO para la recepción de datos del GNSS
 #define TX_PIN 18      ///< GPIO para la transmisión de datos al GNSS
 #define GNSS_BAUD 9600 ///< Tasa de baudios para la comunicación UART con el GNSS
 
-// Inicialización del objeto gnss
-GNSS gnss(Serial1, RX_PIN, TX_PIN, GNSS_BAUD);
+GNSS gnss(Serial1, RX_PIN, TX_PIN, GNSS_BAUD); ///< Objeto GNSS
 
 // ===== IMU =====
-// Inicialización del objeto IMU
-IMU imu;
+IMU imu; ///< Objeto IMU (MPU6050)
 
 // ==== LED =====
-#define LED_PIN 48 ///< GPIO del led RGB
-#define NUM_LEDS 1 ///< Numeros de leds presentes en la tira de leds (Por defecto se usa el integrado en el ESP32S3)
+#define LED_PIN 48 ///< GPIO del LED RGB
+#define NUM_LEDS 1 ///< Número de LEDs presentes en la tira (por defecto el integrado en ESP32-S3)
 
-LED led(NUM_LEDS, LED_PIN);
+LED led(NUM_LEDS, LED_PIN); ///< Objeto LED RGB
 
 // ========== ALARMA =================
 #define ALARM_PIN 10 ///< GPIO de la alarma (buzzer)
 
-ALARM buzzer(ALARM_PIN);
+ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
 
 // ============= TAREAS FreeRTOS ===============================
 
-// ====== Tarea de adquisición de sensores ======
 /**
  * @brief Tarea que lee GNSS e IMU y guarda datos en la estructura compartida.
+ * 
+ * - Actualiza el estado del GNSS (posición, altitud, velocidad).
+ * - Lee aceleración y calcula velocidades desde la IMU.
+ * - Copia la información en la variable global @ref sensorData protegida por un mutex.
+ *
+ * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskSensors(void *pvParameters) {
   (void) pvParameters;
@@ -105,15 +107,18 @@ void taskSensors(void *pvParameters) {
   }
 }
 
-
-// ====== Tarea de alarma ======
 /**
- * @brief Activa la alarma si la velocidad excede el umbral.
+ * @brief Tarea que activa la alarma si la velocidad excede un umbral.
+ *
+ * - Enciende el buzzer si GNSS tiene fix y velocidad > 30 km/h.
+ * - Apaga el buzzer en caso contrario.
+ *
+ * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskAlarm(void *pvParameters) {
   (void) pvParameters;
 
-  const float SPEED_THRESHOLD = 30.0; // km/h
+  const float SPEED_THRESHOLD = 30.0; ///< Umbral de activación de alarma [km/h]
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -129,15 +134,17 @@ void taskAlarm(void *pvParameters) {
 }
 
 /**
- * @brief Cambia el color del LED según el estado del GNSS.
+ * @brief Tarea que cambia el color del LED según el estado del GNSS.
  *
  * - LED rojo mientras no hay fix.
  * - LED verde fijo una vez que el GNSS obtiene fix (permanece verde).
+ *
+ * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskLED(void *pvParameters) {
   (void) pvParameters;
 
-  bool wasReady = false; // Guardar el estado previo
+  bool wasReady = false; ///< Estado previo del GNSS
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -153,13 +160,18 @@ void taskLED(void *pvParameters) {
       xSemaphoreGive(dataMutex);
     }
 
-    vTaskDelay(pdMS_TO_TICKS(250)); // 2 Hz basta
+    vTaskDelay(pdMS_TO_TICKS(250)); // 2 Hz
   }
 }
 
-
 /**
- * @brief Muestra por Serial los datos de los sensores.
+ * @brief Tarea que imprime en Serial los datos de los sensores.
+ *
+ * - Estado GNSS (fix o no).
+ * - Latitud, longitud, altitud, velocidad.
+ * - Datos de la IMU (aceleración y velocidades).
+ *
+ * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskPrint (void *pvParameters) {
   (void) pvParameters;
@@ -183,11 +195,15 @@ void taskPrint (void *pvParameters) {
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // 1 Hz
   }
-
-
 }
 
-
+/**
+ * @brief Configuración inicial del sistema.
+ *
+ * - Inicializa Serial, I2C, GNSS, IMU, LED y buzzer.
+ * - Crea mutex de protección de datos.
+ * - Lanza las tareas de FreeRTOS.
+ */
 void setup()
 {
   Serial.begin(115200);
@@ -221,7 +237,10 @@ void setup()
   xTaskCreatePinnedToCore(taskSensors, "Task Sensors", 4096, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(taskAlarm,   "Task Alarm",   2048, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(taskLED,     "Task LED",     2048, NULL, 1, NULL, 1);
-  xTaskCreatePinnedToCore(taskPrint, "Task Print", 2048, NULL, 1, NULL, 0); 
+  xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); 
 }
 
+/**
+ * @brief Bucle principal (no utilizado en FreeRTOS).
+ */
 void loop () {}
