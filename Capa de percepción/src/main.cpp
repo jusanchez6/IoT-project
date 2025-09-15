@@ -71,15 +71,18 @@ void loop()
   gnss.update();
 
   if (gnss.isReady()) {
+    led.setColor(COLOR_GREEN);
     Serial.print("Lat: "); Serial.println(gnss.latitude(), 6);
     Serial.print("Lng: "); Serial.println(gnss.longitude(), 6);
     Serial.print("Alt: "); Serial.println(gnss.altitude());
     Serial.print("Hora local: "); Serial.println(gnss.localTime(-5));
     Serial.print("Velocidad [km/h]: "); Serial.println(gnss.velocity());
     Serial.println("----------------------------");
+  } else {
+    led.setColor(COLOR_RED);
   }
 
-  led.setColor(COLOR_PINK);
+  
 
   delay(200);
   
