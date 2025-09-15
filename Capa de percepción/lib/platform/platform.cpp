@@ -1,3 +1,17 @@
+/**
+ * @file platform.hpp
+ * @brief Implementación de periféricos de plataforma: LED RGB, alarma (buzzer) y batería.
+ *
+ * Este archivo la implementación de los metodos de las clases que encapsulan
+ * el control de hardware como LEDs RGB, alarmas acústicas y gestión de batería.
+ * 
+ * 
+ * @author Julian Sanchez
+ * @date 15/09/2025
+ * 
+ * @version 1.0
+ */
+
 #include <platform.hpp>
 
 LED::LED(uint16_t numPixels, int16_t pin, neoPixelType type)
