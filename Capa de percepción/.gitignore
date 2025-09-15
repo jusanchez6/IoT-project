@@ -3,3 +3,13 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+
+# Archivos generados por Doxygen
+/html/
+/latex/
+/*.log
+/*.aux
+/*.toc
+
+
