@@ -48,9 +48,7 @@ void ALARM::turnOffAlarm () {
     if (alarmState) {
         digitalWrite(alarmPin, LOW);
         alarmState = false; 
-    } else  {
-        Serial.println("La alarma ya está apagada.");
-    }
+    } 
 }
 
 

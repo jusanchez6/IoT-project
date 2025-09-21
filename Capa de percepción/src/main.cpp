@@ -37,9 +37,7 @@ struct SensorData
   float velocity;     ///< Velocidad GNSS [km/h]
   bool gnssReady;     ///< Estado de GNSS (true = fix disponible)
 
-  float accX;         ///< Aceleración en eje X [m/s^2]
-  float velMeasured;  ///< Velocidad integrada [m/s]
-  float velKalman;    ///< Velocidad filtrada con Kalman [m/s]
+  float vibraciones;  ///< Valor RMS de vibración de la IMU
 };
 
 SensorData sensorData;              ///< Variable global con los datos del sistema
@@ -93,9 +91,7 @@ void taskSensors(void *pvParameters) {
 
     // === IMU ===
     imu.update();
-    temp.accX        = imu.getAccX();
-    temp.velMeasured = imu.getVelMeasured();
-    temp.velKalman   = imu.getVelKalman();
+    
 
     // === Copiar datos a la estructura compartida ===
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -116,21 +112,7 @@ void taskSensors(void *pvParameters) {
  * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskAlarm(void *pvParameters) {
-  (void) pvParameters;
 
-  const float SPEED_THRESHOLD = 30.0; ///< Umbral de activación de alarma [km/h]
-
-  for (;;) {
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
-      if (sensorData.gnssReady && sensorData.velocity > SPEED_THRESHOLD) {
-        buzzer.turnOnAlarm();
-      } else {
-        buzzer.turnOffAlarm();
-      }
-      xSemaphoreGive(dataMutex);
-    }
-    vTaskDelay(pdMS_TO_TICKS(500)); // 2 Hz
-  }
 }
 
 /**
@@ -144,7 +126,7 @@ void taskAlarm(void *pvParameters) {
 void taskLED(void *pvParameters) {
   (void) pvParameters;
 
-  bool wasReady = false; ///< Estado previo del GNSS
+  bool wasReady = false; ///< Estado previo del GN0SS
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -186,9 +168,7 @@ void taskPrint (void *pvParameters) {
       Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2);
       Serial.print(" km/h");
 
-      Serial.print(" || IMU AccX: "); Serial.print(sensorData.accX, 2);
-      Serial.print(" | Vel (measured): "); Serial.print(sensorData.velMeasured, 2);
-      Serial.print(" | Vel (Kalman): "); Serial.println(sensorData.velKalman, 2);
+      Serial.print(" || Vibreciones: "); Serial.println(sensorData.vibraciones, 2);
 
       xSemaphoreGive(dataMutex);
     }
