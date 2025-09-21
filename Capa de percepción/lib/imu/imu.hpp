@@ -8,7 +8,7 @@
  * 
  * @author Julian Sanchez
  * @date 12/09/2025
- * @version 1.0
+ * @version 2.0
  * 
  */
 
@@ -23,16 +23,6 @@
 #define WIN_SIZE 35          ///< Tamaño de la ventana para integración de la velocidad
 #define MOVING_AVG_SIZE 15   ///< Tamaño del buffer para el filtro de media móvil
 
-/**
- * @struct imu_data_t
- * @brief Estructura para almacenar datos del IMU y su procesamiento.
- */
-typedef struct
-{
-    float velocity;              ///< Velocidad estimada (cm/s).
-    float prev_acc;              ///< Última aceleración registrada (m/s^2).
-    float Window[WIN_SIZE];      ///< Ventana de datos para integración y filtrado.
-} imu_data_t;
 
 /**
  * @class IMU
@@ -70,59 +60,29 @@ public:
     void update();
 
     /**
-     * @brief Obtiene la aceleración en el eje X.
-     * @return Aceleración medida en X (m/s^2).
+     * @brief Obtiene el valor RMS de la vibración.
      */
-    float getAccX () const {return accX; }
-
-    /**
-     * @brief Obtiene la velocidad estimada por integración directa de la aceleración.
-     * @return Velocidad estimada (cm/s).
-     */
-    float getVelMeasured() const {return vel_measured; }
-    
-    /**
-     * @brief Obtiene la velocidad filtrada mediante Kalman.
-     * @return Velocidad filtrada (cm/s).
-     */
-    float getVelKalman() const {return vel_kalman; }
-
+    float getVibRMS() const { return vibrationRMS; }
 private:
     Adafruit_MPU6050 mpu;     ///< Objeto de la librería Adafruit para el MPU6050.
-    imu_data_t imu_data;      ///< Datos del IMU y ventana de integración.
     unsigned long lastTime;   ///< Marca de tiempo de la última actualización.
 
-    // ======= KALMAN =========
-    float P;  ///< Covarianza del error de estimación.
-    float Q;  ///< Varianza del ruido del proceso.
-    float R;  ///< Varianza del ruido de la medición.
-    float K;  ///< Ganancia de Kalman.
+    // Variables para calculo de la vibración
 
-    // ===== FILTRO DE MEDIA MOVIL ====
-    float acc_buffer[MOVING_AVG_SIZE];  ///< Buffer circular de aceleraciones.
-    int acc_index;                      ///< Índice actual en el buffer.
-    bool buffer_full;                   ///< Indica si el buffer está lleno.
+    float hpX, hpY, hpZ;  ///< Componentes de alta frecuencia de la aceleración.
+    float accX_prev, accY_prev, accZ_prev; ///< Últimas aceleraciones registradas.
 
-    // ===== ESTIMACIÓN DE VELOCIDAD =====
-    /**
-     * @brief Calcula el promedio móvil de un nuevo dato de aceleración.
-     * @param new_sample Nueva muestra de aceleración.
-     * @return Aceleración filtrada.
-     */
-    float moving_average(float new_sample);
+    float vibrationRMS;                         ///< Valor RMS de la vibración calculada.
+    unsigned long vib_start_time;               ///< Marca de tiempo para cálculo de vibración.
+    float vib_sumSq;                            ///< Suma de cuadrados para cálculo de vibración.
+    int vib_count;                              ///< Contador de muestras para cálculo de vibración.
 
-    /**
-     * @brief Estima la velocidad a partir de la aceleración usando integración.
-     * @param imu_data Estructura con datos previos y ventana.
-     * @param acceleration Nueva muestra de aceleración.
-     * @param time_interval Intervalo de tiempo desde la última actualización (s).
-     */
-    void estimate_velocity_imu(imu_data_t *imu_data, float acceleration, float time_interval);
+    static constexpr float alpha = 0.9f;        ///< Coeficiente para filtro pasa-bajos.
+    static constexpr int SAMPLE_WINDOW = 200;   ///< Intervalo de tiempo fijo para integración (200 ms).
 
-    // ==== VARIABLES DE SALIDA =====
-    float accX;          ///< Aceleración medida en el eje X.
-    float vel_measured;  ///< Velocidad estimada por integración directa.
-    float vel_kalman;    ///< Velocidad filtrada con Kalman.
+
+
+
 };
 
 #endif // IMU_HPP
