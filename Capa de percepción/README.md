@@ -116,7 +116,7 @@ GNSS Ready: YES | Lat: 6.251234 | Lng: -75.563456 | Alt: 1543.21 m | Vel: 12.34 
 
 ---
 
-## 📊 Diagrama de Tareas
+## Diagrama de Tareas
 
 ```mermaid
 flowchart TD
@@ -130,7 +130,7 @@ flowchart TD
 
 ---
 
-## 📅 Roadmap
+## Roadmap
 
 * [x] Integración GNSS
 * [x] Integración IMU
@@ -140,14 +140,14 @@ flowchart TD
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 **Julián Sánchez**
-📅 15/09/2025
+15/09/2025
 
 ---
 
-## 📜 Licencia
+## Licencia
 
 Este proyecto se distribuye bajo la licencia **MIT**.
 
