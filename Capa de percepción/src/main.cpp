@@ -48,6 +48,8 @@ SemaphoreHandle_t dataMutex;        ///< Mutex para proteger acceso concurrente 
 #define TX_PIN 18      ///< GPIO para la transmisión de datos al GNSS
 #define GNSS_BAUD 9600 ///< Tasa de baudios para la comunicación UART con el GNSS
 
+#define SPEED_THRESHOLD 30.0 
+
 GNSS gnss(Serial1, RX_PIN, TX_PIN, GNSS_BAUD); ///< Objeto GNSS
 
 // ===== IMU =====
@@ -76,7 +78,6 @@ ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
  * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskSensors(void *pvParameters) {
-  (void) pvParameters;
 
   for (;;) {
     SensorData temp; // temporal
@@ -104,7 +105,7 @@ void taskSensors(void *pvParameters) {
 }
 
 /**
- * @brief Tarea que activa la alarma si la velocidad excede un umbral.
+ * @brief Tarea que activa la alarma si hay mas vibraciones de lo normal para indicar el estado de una carretera.
  *
  * - Enciende el buzzer si GNSS tiene fix y velocidad > 30 km/h.
  * - Apaga el buzzer en caso contrario.
@@ -112,6 +113,19 @@ void taskSensors(void *pvParameters) {
  * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskAlarm(void *pvParameters) {
+  
+  for (;;) {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE){
+      if (sensorData.gnssReady && sensorData.velocity > SPEED_THRESHOLD) {
+        buzzer.turnOnAlarm();
+      } else {
+        buzzer.turnOffAlarm();
+      }
+
+      xSemaphoreGive(dataMutex);
+    }
+    vTaskDelay(pdMS_TO_TICKS(500));
+  }
 
 }
 
@@ -119,13 +133,11 @@ void taskAlarm(void *pvParameters) {
  * @brief Tarea que cambia el color del LED según el estado del GNSS.
  *
  * - LED rojo mientras no hay fix.
- * - LED verde fijo una vez que el GNSS obtiene fix (permanece verde).
+ * - LED verde fijo una vez que el GNSS obtiene fix
  *
  * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskLED(void *pvParameters) {
-  (void) pvParameters;
-
   bool wasReady = false; ///< Estado previo del GN0SS
 
   for (;;) {
@@ -156,7 +168,6 @@ void taskLED(void *pvParameters) {
  * @param pvParameters Parámetros de tarea (no usados).
  */
 void taskPrint (void *pvParameters) {
-  (void) pvParameters;
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -165,10 +176,9 @@ void taskPrint (void *pvParameters) {
       Serial.print(" | Lat: "); Serial.print(sensorData.latitude, 6);
       Serial.print(" | Lng: "); Serial.print(sensorData.longitude, 6);
       Serial.print(" | Alt: "); Serial.print(sensorData.altitude, 2);
-      Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2);
-      Serial.print(" km/h");
-
-      Serial.print(" || Vibreciones: "); Serial.println(sensorData.vibraciones, 2);
+      Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2); 
+      Serial.print(" km/h | Vibraciones: "); Serial.print(sensorData.vibraciones, 2);
+      Serial.println(" m/s^2"); 
 
       xSemaphoreGive(dataMutex);
     }
