@@ -5,6 +5,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 #include <time.h>
 
 
@@ -12,15 +13,12 @@
 
 
 
-void ask_credentials(String &ssid, String &pass);
-
-bool connect_to_wifi(const String &ssid, const String &pass);
-
 void setup_wifi();
 
 void syncTime();
 
-void sendData(&SensorData_t);
+void sendData(SensorData_t& sensor_data);
 
+void init_communications();
 
 #endif //WIFI_FUNCS_HPP

@@ -24,24 +24,11 @@
 #include <wifi_funcs.hpp>
 #include <imu.hpp>
 #include <platform.hpp>
+#include <types.hpp>
 
-/**
- * @struct SensorData
- * @brief Estructura para almacenar datos de GNSS e IMU.
- */
-struct SensorData
-{
-  float latitude;     ///< Latitud actual [grados]
-  float longitude;    ///< Longitud actual [grados]
-  float altitude;     ///< Altitud actual [m]
-  float velocity;     ///< Velocidad GNSS [km/h]
-  bool gnssReady;     ///< Estado de GNSS (true = fix disponible)
 
-  float vibraciones;  ///< Valor RMS de vibración de la IMU
-};
-
-SensorData sensorData;              ///< Variable global con los datos del sistema
-SemaphoreHandle_t dataMutex;        ///< Mutex para proteger acceso concurrente a sensorData
+SensorData_t sensorData;              ///< Variable global con los datos del sistema
+SemaphoreHandle_t dataMutex;          ///< Mutex para proteger acceso concurrente a sensorData
 
 // ======== GNSS =============
 #define RX_PIN 17      ///< GPIO para la recepción de datos del GNSS
@@ -65,6 +52,11 @@ LED led(NUM_LEDS, LED_PIN); ///< Objeto LED RGB
 #define ALARM_PIN 10 ///< GPIO de la alarma (buzzer)
 
 ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
+
+// =========== WIFI ===================
+
+String ssid;
+String password;
 
 // ============= TAREAS FreeRTOS ===============================
 
