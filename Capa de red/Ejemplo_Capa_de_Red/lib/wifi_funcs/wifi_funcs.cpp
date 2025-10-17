@@ -1,13 +1,14 @@
 #include <wifi_funcs.hpp>
 
+const char *ssid = "iPhone de Julián ";
+const char *password = "sanchez06";
 
-
-const char* ssid = "iPhone de Julián ";
-const char* password = "sanchez06";
-
-const char* mqtt_server = "raspberry.local";
+const char *mqtt_server = "raspberry.local";
 const int mqtt_port = 8883;
-const char* topic = "bike/sensors";
+const char *topic = "bike/sensors";
+
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
 
 const char *ca_cert =
     "-----BEGIN CERTIFICATE-----\n"
@@ -36,79 +37,31 @@ const char *ca_cert =
     "NJTPHALEWsGlEsY=\n"
     "-----END CERTIFICATE-----\n";
 
-void ask_credentials(String &ssid, String &pass)
+void setup_wifi()
 {
-    Serial.println("\nConfiguración WiFi:");
-    Serial.print("Ingrese SSID: ");
-    while (ssid.length() == 0)
-    {
-        if (Serial.available())
-        {
-            ssid = Serial.readStringUntil('\n');
-            ssid.trim();
-        }
-    }
-    Serial.print("\nIngrese Contraseña: ");
-    while (pass.length() == 0)
-    {
-        if (Serial.available())
-        {
-            pass = Serial.readStringUntil('\n');
-            pass.trim();
-        }
-    }
-}
-
-bool connect_to_wifi(const String &ssid, const String &pass)
-{
-
-    Serial.println("\nConectando a WiFi...");
-
-    WiFi.begin(ssid.c_str(), pass.c_str());
-    int timeout = 0;
-
-    while (WiFi.status() != WL_CONNECTED && timeout < 20)
-    {
-        delay(500);
-        Serial.print(".");
-        timeout++;
-    }
-
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        Serial.println("\nConectado a WiFi!");
-        Serial.print("Dirección IP: ");
-        Serial.println(WiFi.localIP());
-        return true;
-    } else {
-        Serial.println("\nError al conectar a WiFi.");
-        return false;
-    }
-}
-
-
-void setup_wifi() {
     Serial.println();
-    Serial.print("Cone3ctando a Wifi: ");
+    Serial.print("Conectando a Wifi: ");
     Serial.println(ssid);
     WiFi.begin(ssid, password);
 
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED)
+    {
         delay(1000);
         Serial.print(".");
     }
 
     Serial.print("\nWiFi conectado IP: ");
     Serial.println(WiFi.localIP());
-
 }
 
-void syncTime() {
+void syncTime()
+{
     configTime(0, 0, "time.google.com", "co.pool.ntp.org");
     Serial.print("Esperando sincronización NTP");
     time_t now = time(nullptr);
 
-    while (now < 8 * 3600 * 2) {
+    while (now < 8 * 3600 * 2)
+    {
         delay(500);
         Serial.print(".");
         now = time(nullptr);
@@ -117,6 +70,56 @@ void syncTime() {
     Serial.println("\nHora Sincronizada");
 }
 
-void sendData(&SensorData_t) {
+void reconnect()
+{
+
+    while (!client.connected())
+    {
+        Serial.print("Conectando al broker MQTT...");
+
+        if (client.connect("ESP32Client"))
+        {
+            Serial.println("Conectado");
+        }
+        else
+        {
+            Serial.print("Fallo, rc=");
+            Serial.print(client.state());
+            Serial.println(" Reintentando en 5 segundos...");
+            delay(5000);
+        }
+    }
+}
+
+void sendData(SensorData_t &sensor_data)
+{
+    if (!client.connected())
+        reconnect();
+
+    client.loop();
+
+    StaticJsonDocument<200> doc;
+
+    doc["latitude"] = sensor_data.latitude;
+    doc["longitude"] = sensor_data.longitude;
+    doc["altitude"] = sensor_data.altitude;
+    doc["velocity"] = sensor_data.velocity;
+    doc["vibration"] = sensor_data.vibraciones;
+
+    char json_msg[200];
+    serializeJson(doc, json_msg);
+
+    client.publish(topic, json_msg);
+
     
+}
+
+void init_communications()
+{
+    setup_wifi();
+    syncTime();
+
+    espClient.setCACert(ca_cert);
+    client.setServer(mqtt_server, mqtt_port);
+    reconnect();
 }
