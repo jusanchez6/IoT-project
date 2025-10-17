@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/home/julian/Univerisdad/IoT/Capa de percepción",
+    "command": "gcc -Iinclude -Isrc -Ilib -DPLATFORMIO=1 -std=c11 -c src/main.c -o src/main.o",
+    "file": "src/main.c"
+  }
+]

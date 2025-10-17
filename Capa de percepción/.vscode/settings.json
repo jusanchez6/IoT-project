@@ -7,5 +7,13 @@
         "string": "cpp",
         "vector": "cpp",
         "string_view": "cpp"
-    }
+    },
+
+    "clangd.arguments": [
+        "-Wno-error",
+        "-w",
+        "--log=error" // evita mensajes molestos en el output
+    ],
+
+    "C_Cpp.errorSquiggles": "disabled"
 }
