@@ -20,7 +20,7 @@ void setup_wifi();
 
 void syncTime();
 
-void sendData(&SensorData_t);
+// void sendData(&SensorData_t);
 
 
 #endif //WIFI_FUNCS_HPP

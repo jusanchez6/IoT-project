@@ -117,6 +117,3 @@ void syncTime() {
     Serial.println("\nHora Sincronizada");
 }
 
-void sendData(&SensorData_t) {
-    
-}

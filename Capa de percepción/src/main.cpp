@@ -72,7 +72,7 @@ String password;
 void taskSensors(void *pvParameters) {
 
   for (;;) {
-    SensorData temp; // temporal
+    SensorData_t temp; // temporal
 
     // === GNSS ===
     gnss.update();
@@ -84,6 +84,7 @@ void taskSensors(void *pvParameters) {
 
     // === IMU ===
     imu.update();
+    temp.vibraciones = imu.getVibRMS();
     
 
     // === Copiar datos a la estructura compartida ===
@@ -92,7 +93,7 @@ void taskSensors(void *pvParameters) {
       xSemaphoreGive(dataMutex);
     }
 
-    vTaskDelay(pdMS_TO_TICKS(500)); // 2 Hz de muestreo
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 1 Hz de muestreo
   }
 }
 
