@@ -53,10 +53,6 @@ LED led(NUM_LEDS, LED_PIN); ///< Objeto LED RGB
 
 ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
 
-// =========== WIFI ===================
-
-String ssid;
-String password;
 
 // ============= TAREAS FreeRTOS ===============================
 
@@ -72,7 +68,7 @@ String password;
 void taskSensors(void *pvParameters) {
 
   for (;;) {
-    SensorData temp; // temporal
+    SensorData_t temp; // temporal
 
     // === GNSS ===
     gnss.update();
@@ -84,6 +80,7 @@ void taskSensors(void *pvParameters) {
 
     // === IMU ===
     imu.update();
+    temp.vibraciones = imu.getVibRMS();
     
 
     // === Copiar datos a la estructura compartida ===
@@ -92,7 +89,7 @@ void taskSensors(void *pvParameters) {
       xSemaphoreGive(dataMutex);
     }
 
-    vTaskDelay(pdMS_TO_TICKS(500)); // 2 Hz de muestreo
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 1 Hz de muestreo
   }
 }
 
@@ -179,6 +176,20 @@ void taskPrint (void *pvParameters) {
   }
 }
 
+
+void taskSend (void *pvParameters) {
+
+  for (;;) {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10) == pdTRUE)) {
+      sendData(sensorData);
+
+      xSemaphoreGive(dataMutex);
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(1000)); 
+  }
+} 
+
 /**
  * @brief Configuración inicial del sistema.
  *
@@ -215,11 +226,16 @@ void setup()
     while (true);
   }
 
+  // connect to wifi
+  setup_wifi();
+
   // ===== Crear tareas =====
   xTaskCreatePinnedToCore(taskSensors, "Task Sensors", 4096, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(taskAlarm,   "Task Alarm",   2048, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(taskLED,     "Task LED",     2048, NULL, 1, NULL, 1);
-  xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); 
+  //xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); ------> debughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh|1
+  xTaskCreatePinnedToCore(taskSend,    "Task Send",   4096, NULL, 1, NULL, 0); 
+
 }
 
 /**

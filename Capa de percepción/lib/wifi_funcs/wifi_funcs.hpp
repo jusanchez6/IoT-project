@@ -6,6 +6,7 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <time.h>
+#include <ArduinoJson.h>
 
 
 #include <types.hpp>
@@ -20,7 +21,11 @@ void setup_wifi();
 
 void syncTime();
 
-void sendData(&SensorData_t);
+void reconnect();
+
+void init_communications();
+
+void sendData(SensorData_t &sensor_data);
 
 
 #endif //WIFI_FUNCS_HPP

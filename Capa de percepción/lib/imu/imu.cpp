@@ -60,6 +60,12 @@ void IMU::update() {
   vib_sumSq += vib_instant * vib_instant;
   vib_count++;
 
+  // print debug
+
+  Serial.print("Vibraciones instantaneas: ");
+  Serial.println(vib_instant);
+
+
   if (millis() - vib_start_time >= SAMPLE_WINDOW) {
     vibrationRMS = sqrt(vib_sumSq / vib_count);
     vib_sumSq = 0.0f;

@@ -1,14 +1,14 @@
-#include <wifi_funcs.hpp>
-
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <PubSubClient.h>
+#include "time.h" // Para sincronización NTP
+// Wi-Fi y MQTT
 const char *ssid = "iPhone de Julián ";
 const char *password = "sanchez06";
-
-const char *mqtt_server = "raspberry.local";
+const char *mqtt_server = "raspberry.local"; // IP del broker
 const int mqtt_port = 8883;
-const char *topic = "bike/mtls";
-
-WiFiClientSecure espClient;
-PubSubClient client(espClient);
+const char *topic = "test/mtls";
+// Certificados
 
 const char *ca_cert =
     "-----BEGIN CERTIFICATE-----\n"
@@ -88,94 +88,69 @@ const char *client_key =
     "y80JDmKi4lA9SiT6WuTRvu6h4F6EzWHtacAHVAI38b4TE6QYSDGcyE8t8k6eio4B\n"
     "91UBK/Kn+zLedVoxE7ddCfvb\n"
     "-----END PRIVATE KEY-----\n";
-
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
 void setup_wifi()
 {
-    Serial.println();
-    Serial.print("Conectando a Wifi: ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.print(".");
-    }
-
-    Serial.print("\nWiFi conectado IP: ");
-    Serial.println(WiFi.localIP());
+  Serial.print("Conectando a Wi-Fi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi conectado");
 }
-
 void syncTime()
 {
-    configTime(0, 0, "time.google.com", "co.pool.ntp.org");
-    Serial.print("Esperando sincronización NTP");
-    time_t now = time(nullptr);
-
-    while (now < 8 * 3600 * 2)
-    {
-        delay(500);
-        Serial.print(".");
-        now = time(nullptr);
-    }
-
-    Serial.println("\nHora Sincronizada");
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  Serial.print("Sincronizando hora");
+  time_t now = time(nullptr);
+  while (now < 8 * 3600 * 2)
+  {
+    delay(500);
+    Serial.print(".");
+    now = time(nullptr);
+  }
+  Serial.println("\nHora sincronizada");
 }
-
 void reconnect()
 {
-
-    while (!client.connected())
+  while (!client.connected())
+  {
+    Serial.print("Conectando al broker MQTT...");
+    if (client.connect("ESP32Client"))
     {
-        Serial.print("Conectando al broker MQTT...");
-
-        if (client.connect("ESP32Client"))
-        {
-            Serial.println("Conectado");
-        }
-        else
-        {
-            Serial.print("Fallo, rc=");
-            Serial.print(client.state());
-            Serial.println(" Reintentando en 5 segundos...");
-            delay(5000);
-        }
+      Serial.println("Conectado");
     }
+    else
+    {
+      Serial.print("Fallo, rc=");
+      Serial.print(client.state());
+      Serial.println(" reintentando...");
+      delay(5000);
+    }
+  }
 }
 
-void sendData(SensorData_t &sensor_data)
+void setup()
 {
-    if (!client.connected())
-        reconnect();
-
-    client.loop();
-
-    StaticJsonDocument<200> doc;
-
-    doc["Device_id"] = 
-    doc["latitude"] = sensor_data.latitude;
-    doc["longitude"] = sensor_data.longitude;
-    doc["altitude"] = sensor_data.altitude;
-    doc["velocity"] = sensor_data.velocity;
-    doc["vibration"] = sensor_data.vibraciones;
-
-    char json_msg[200];
-    serializeJson(doc, json_msg);
-
-    client.publish(topic, json_msg);
-
-    
+  Serial.begin(115200);
+  setup_wifi();
+  syncTime();
+  espClient.setCACert(ca_cert);
+  espClient.setCertificate(client_cert);
+  espClient.setPrivateKey(client_key);
+  client.setServer(mqtt_server, mqtt_port);
+  reconnect();
 }
-
-void init_communications()
+void loop()
 {
-    setup_wifi();
-    syncTime();
-
-    espClient.setCACert(ca_cert);
-    espClient.setCertificate(client_cert);
-    espClient.setPrivateKey(client_key);
-    client.setServer(mqtt_server, mqtt_port);
-    
+  if (!client.connected())
     reconnect();
+  client.loop();
+  const char *msg = "Hola desde ESP32 con autenticación mutua";
+  client.publish(topic, msg);
+  Serial.println("Mensaje enviado");
+  delay(5000);
 }
