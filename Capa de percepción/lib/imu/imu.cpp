@@ -43,10 +43,18 @@ void IMU::update() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  float accX = a.acceleration.x;
-  float accY = a.acceleration.y;
-  float accZ = a.acceleration.z;
+  accX = a.acceleration.x;
+  accY = a.acceleration.y;
+  accZ = a.acceleration.z;
 
+  gyroX = g.gyro.x;
+  gyroY = g.gyro.y;
+  gyroZ = g.gyro.z;
+
+  pitch = g.gyro.pitch;
+  roll = g.gyro.roll;
+  
+  
   hpX = alpha * (hpX + accX - accX_prev);
   hpY = alpha * (hpY + accY - accY_prev);
   hpZ = alpha * (hpZ + accZ - accZ_prev);

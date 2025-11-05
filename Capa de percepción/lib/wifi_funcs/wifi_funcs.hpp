@@ -25,7 +25,7 @@ void reconnect();
 
 void init_communications();
 
-String msgToJson(const SensorData_t &sensor_data);
+String msgToJson(const Telemetry_t &data);
 
 void sendData(const String &data);
 

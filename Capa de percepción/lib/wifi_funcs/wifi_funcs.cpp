@@ -286,25 +286,25 @@ void reconnect()
 
 
 
-String msgToJson (const SensorData_t &sensor_data) {
-    StaticJsonDocument<512> doc;
+String msgToJson (const Telemetry_t &data) {
+    JsonDocument doc;
 
-    doc["device_id"] = "esp32_Julián";
-    doc["timestamp"] = millis();
-    doc["sequence_id"] = 0;
-    doc["status"] = 1;
+    doc["device_id"] = data.deviceId;
+    doc["timestamp"] = data.timeStamp;
+    doc["sequence_id"] = data.sequenceId;
 
     // AQUI VA UNA ESTRUCTURA SOLO PARA EL GPS!!!
 
-    doc["gps"]["latitude"] = sensor_data.latitude;
-    doc["gps"]["longitude"] = sensor_data.longitude;
-    doc["gps"]["altitude"] = sensor_data.altitude;
-    doc["gps"]["velocity"] = sensor_data.velocity;
-    doc["gps"]["Hora local"] = sensor_data.localTime;
+    doc["gps"]["latitude"] = data.gpsData.latitude;
+    doc["gps"]["longitude"] = data.gpsData.longitude;
+    doc["gps"]["altitude"] = data.gpsData.altitude;
+    doc["gps"]["velocity"] = data.gpsData.velocity;
+    doc["gps"]["Hora local"] = data.gpsData.localTime;
 
     // AQUI VA UNA ESTRUCTURA SOLO PARA LA IMU
 
-    doc["imu"]["vibration"] = sensor_data.vibraciones;
+    doc["imu"]["vibration"] = data.imuData.vibraciones;
+
 
     // ALERTAS
 
