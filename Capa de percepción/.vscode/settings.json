@@ -6,7 +6,15 @@
         "deque": "cpp",
         "string": "cpp",
         "vector": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "optional": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp"
     },
 
     "clangd.arguments": [

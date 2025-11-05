@@ -62,8 +62,8 @@ void IMU::update() {
 
   // print debug
 
-  Serial.print("Vibraciones instantaneas: ");
-  Serial.println(vib_instant);
+  // Serial.print("Vibraciones instantaneas: ");
+  // Serial.println(vib_instant);
 
 
   if (millis() - vib_start_time >= SAMPLE_WINDOW) {

@@ -184,9 +184,10 @@ void taskSend (void *pvParameters) {
       sendData(sensorData);
 
       xSemaphoreGive(dataMutex);
+      Serial.println("Datos enviados\n");
     }
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); 
+    vTaskDelay(pdMS_TO_TICKS(30000)); 
   }
 } 
 
@@ -234,7 +235,7 @@ void setup()
   xTaskCreatePinnedToCore(taskAlarm,   "Task Alarm",   2048, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(taskLED,     "Task LED",     2048, NULL, 1, NULL, 1);
   //xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); ------> debughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh|1
-  xTaskCreatePinnedToCore(taskSend,    "Task Send",   4096, NULL, 1, NULL, 0); 
+  xTaskCreatePinnedToCore(taskSend,    "Task Send",   8192, NULL, 1, NULL, 0); 
 
 }
 

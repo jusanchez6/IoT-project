@@ -11,7 +11,7 @@
 
 #include <types.hpp>
 
-
+#define CLOUD_SERVER 1
 
 void ask_credentials(String &ssid, String &pass);
 
