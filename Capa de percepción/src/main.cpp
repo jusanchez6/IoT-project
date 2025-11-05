@@ -77,6 +77,7 @@ void taskSensors(void *pvParameters) {
     temp.longitude  = gnss.longitude();
     temp.altitude   = gnss.altitude();
     temp.velocity   = gnss.velocity();
+    temp.localTime  = gnss.localTime();
 
     // === IMU ===
     imu.update();
@@ -181,7 +182,10 @@ void taskSend (void *pvParameters) {
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10) == pdTRUE)) {
-      sendData(sensorData);
+      String msg = msgToJson(sensorData);
+      sendData(msg);
+
+      vTaskDelay(pdMS_TO_TICKS(500));
 
       xSemaphoreGive(dataMutex);
       Serial.println("Datos enviados\n");

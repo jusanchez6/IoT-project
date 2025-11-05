@@ -11,7 +11,7 @@
 
 #include <types.hpp>
 
-#define CLOUD_SERVER 1
+#define CLOUD_SERVER 0
 
 void ask_credentials(String &ssid, String &pass);
 
@@ -25,7 +25,9 @@ void reconnect();
 
 void init_communications();
 
-void sendData(SensorData_t &sensor_data);
+String msgToJson(const SensorData_t &sensor_data);
+
+void sendData(const String &data);
 
 
 #endif //WIFI_FUNCS_HPP

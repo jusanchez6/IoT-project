@@ -12,8 +12,9 @@ typedef struct
     float altitude;     ///< Altitud actual [m]
     float velocity;     ///< Velocidad GNSS [km/h]
     bool gnssReady;     ///< Estado de GNSS (true = fix disponible)
-
     float vibraciones;  ///< Valor RMS de vibración de la IMU
+
+    String localTime;
 } SensorData_t;
 
 

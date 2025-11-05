@@ -1,9 +1,9 @@
 #include <wifi_funcs.hpp>
 
-const char *ssid = "iPhone de Julián ";
-const char *password = "sanchez06";
+const char *ssid = "Margarita 2";
+const char *password = "m43420813s";
 
-#ifndef CLOUD_SERVER
+#if !CLOUD_SERVER
 
 const char *mqtt_server = "raspberry.local";
 const int mqtt_port = 8883;
@@ -95,8 +95,7 @@ const char *client_key =
 //==================================================================================
 // =============================== certifados Amazon ===============================
 //==================================================================================
-#endif
-
+#elif CLOUD_SERVER
 const char *mqtt_server = "a1lcoy4gm8z6za-ats.iot.us-east-2.amazonaws.com";
 const int mqtt_port = 8883;
 const char *topic = "bike/mtls";
@@ -176,6 +175,7 @@ const char *client_key =
     "frwMSZHO7lDySWNJ7c1W7ZcRDBT79I0pvVbWP/CXuLngQOim2MZm2sLhBoAODdpl\n"
     "VwMMc0RsI6nzYkzhVPeVguj0IB+ZeK73wh8HrkUDHw1YHKMYie7U\n"
     "-----END RSA PRIVATE KEY-----\n";
+#endif
 
 void ask_credentials(String &ssid, String &pass)
 {
@@ -284,25 +284,48 @@ void reconnect()
     }
 }
 
-void sendData(SensorData_t &sensor_data)
+
+
+String msgToJson (const SensorData_t &sensor_data) {
+    StaticJsonDocument<512> doc;
+
+    doc["device_id"] = "esp32_Julián";
+    doc["timestamp"] = millis();
+    doc["sequence_id"] = 0;
+    doc["status"] = 1;
+
+    // AQUI VA UNA ESTRUCTURA SOLO PARA EL GPS!!!
+
+    doc["gps"]["latitude"] = sensor_data.latitude;
+    doc["gps"]["longitude"] = sensor_data.longitude;
+    doc["gps"]["altitude"] = sensor_data.altitude;
+    doc["gps"]["velocity"] = sensor_data.velocity;
+    doc["gps"]["Hora local"] = sensor_data.localTime;
+
+    // AQUI VA UNA ESTRUCTURA SOLO PARA LA IMU
+
+    doc["imu"]["vibration"] = sensor_data.vibraciones;
+
+    // ALERTAS
+
+    
+
+    String out;
+    serializeJson(doc, out);
+    return out;
+
+}
+
+void sendData(const String &data)
 {
     if (!client.connected())
         reconnect();
 
     client.loop();
 
-    StaticJsonDocument<200> doc;
+    
 
-    doc["latitude"] = sensor_data.latitude;
-    doc["longitude"] = sensor_data.longitude;
-    doc["altitude"] = sensor_data.altitude;
-    doc["velocity"] = sensor_data.velocity;
-    doc["vibration"] = sensor_data.vibraciones;
-
-    char json_msg[200];
-    serializeJson(doc, json_msg);
-
-    client.publish(topic, json_msg);
+    client.publish(topic, data.c_str());
 }
 
 void init_communications()
