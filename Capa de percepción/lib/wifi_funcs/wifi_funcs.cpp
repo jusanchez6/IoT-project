@@ -284,9 +284,8 @@ void reconnect()
     }
 }
 
-
-
-String msgToJson (const Telemetry_t &data) {
+String msgToJson(const Telemetry_t &data)
+{
     JsonDocument doc;
 
     doc["device_id"] = data.deviceId;
@@ -303,17 +302,29 @@ String msgToJson (const Telemetry_t &data) {
 
     // AQUI VA UNA ESTRUCTURA SOLO PARA LA IMU
 
+    doc["imu"]["accel_x"] = data.imuData.aX;
+    doc["imu"]["accel_y"] = data.imuData.aY;
+    doc["imu"]["accel_z"] = data.imuData.aZ;
+    doc["imu"]["gyro_x"] = data.imuData.gX;
+    doc["imu"]["gyro_y"] = data.imuData.gY;
+    doc["imu"]["gyro_z"] = data.imuData.gZ;
     doc["imu"]["vibration"] = data.imuData.vibraciones;
 
+    doc["angles"]["roll_deg"] = data.anglesData.roll;
+    doc["angles"]["pitch_deg"] = data.anglesData.picht;
 
     // ALERTAS
 
-    
+    size_t estimated = measureJson(doc);
+    Serial.printf("Tamaño estimado JSON: %u bytes\n", estimated);
 
     String out;
     serializeJson(doc, out);
-    return out;
 
+    Serial.print("Tamaño JSON: ");
+    Serial.print(out.length());
+    Serial.println(" bytes");
+    return out;
 }
 
 void sendData(const String &data)
@@ -323,9 +334,12 @@ void sendData(const String &data)
 
     client.loop();
 
-    
+    bool ok = client.publish(topic, data.c_str());
 
-    client.publish(topic, data.c_str());
+    if (ok)
+        Serial.println("Publicación exitosa");
+    else
+        Serial.println("Error en publish()");
 }
 
 void init_communications()

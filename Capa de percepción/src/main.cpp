@@ -67,8 +67,10 @@ ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
  */
 void taskSensors(void *pvParameters) {
 
+  Telemetry_t temp; // temporal
+
   for (;;) {
-    Telemetry_t temp; // temporal
+    
 
     // === TELEMETRIA ====
     temp.timeStamp = millis();
@@ -87,16 +89,17 @@ void taskSensors(void *pvParameters) {
     // === IMU ===
     imu.update();
 
-    temp.imuData.aX         = imu.getAccX();
-    temp.imuData.aY         = imu.getAccY();
-    temp.imuData.aZ         = imu.getAccZ();
+    temp.imuData.vibraciones  = imu.getVibRMS();
+    temp.imuData.aX           = imu.getAccX();
+    temp.imuData.aY           = imu.getAccY();
+    temp.imuData.aZ           = imu.getAccZ();
 
-    temp.imuData.gX         = imu.getGyroX();
-    temp.imuData.gY         = imu.getGyroY();
-    temp.imuData.gZ         = imu.getGyroZ();
+    temp.imuData.gX           = imu.getGyroX();
+    temp.imuData.gY           = imu.getGyroY();
+    temp.imuData.gZ           = imu.getGyroZ();
 
-    temp.anglesData.picht   = imu.getPitch();
-    temp.anglesData.roll    = imu.getRoll();
+    temp.anglesData.picht     = imu.getPitch();
+    temp.anglesData.roll      = imu.getRoll();
     
 
     // === Copiar datos a la estructura compartida ===
