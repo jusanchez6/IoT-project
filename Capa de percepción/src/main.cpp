@@ -14,7 +14,7 @@
  *
  * @author Julián Sánchez
  * @date 15/09/2025
- * @version 1.01
+ * @version 1.3
  */
 
 #include <Arduino.h>
@@ -27,9 +27,9 @@
 #include <types.hpp>
 
 
-SensorData_t sensorData;              ///< Variable global con los datos del sistema
 SemaphoreHandle_t dataMutex;          ///< Mutex para proteger acceso concurrente a sensorData
 
+Telemetry_t Data;
 // ======== GNSS =============
 #define RX_PIN 17      ///< GPIO para la recepción de datos del GNSS
 #define TX_PIN 18      ///< GPIO para la transmisión de datos al GNSS
@@ -67,25 +67,44 @@ ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
  */
 void taskSensors(void *pvParameters) {
 
+  Telemetry_t temp; // temporal
+
   for (;;) {
-    SensorData_t temp; // temporal
+    
+
+    // === TELEMETRIA ====
+    temp.timeStamp = millis();
+    temp.sequenceId += 1;
+
 
     // === GNSS ===
     gnss.update();
-    temp.gnssReady  = gnss.isReady();
-    temp.latitude   = gnss.latitude();
-    temp.longitude  = gnss.longitude();
-    temp.altitude   = gnss.altitude();
-    temp.velocity   = gnss.velocity();
+    temp.gpsData.gnssReady  = gnss.isReady();
+    temp.gpsData.latitude   = gnss.latitude();
+    temp.gpsData.longitude  = gnss.longitude();
+    temp.gpsData.altitude   = gnss.altitude();
+    temp.gpsData.velocity   = gnss.velocity();
+    temp.gpsData.localTime  = gnss.localTime();
 
     // === IMU ===
     imu.update();
-    temp.vibraciones = imu.getVibRMS();
+
+    temp.imuData.vibraciones  = imu.getVibRMS();
+    temp.imuData.aX           = imu.getAccX();
+    temp.imuData.aY           = imu.getAccY();
+    temp.imuData.aZ           = imu.getAccZ();
+
+    temp.imuData.gX           = imu.getGyroX();
+    temp.imuData.gY           = imu.getGyroY();
+    temp.imuData.gZ           = imu.getGyroZ();
+
+    temp.anglesData.picht     = imu.getPitch();
+    temp.anglesData.roll      = imu.getRoll();
     
 
     // === Copiar datos a la estructura compartida ===
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
-      sensorData = temp;
+      Data = temp;
       xSemaphoreGive(dataMutex);
     }
 
@@ -105,7 +124,7 @@ void taskAlarm(void *pvParameters) {
   
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE){
-      if (sensorData.gnssReady && sensorData.velocity > SPEED_THRESHOLD) {
+      if (Data.gpsData.gnssReady && Data.gpsData.velocity > SPEED_THRESHOLD) {
         buzzer.turnOnAlarm();
       } else {
         buzzer.turnOffAlarm();
@@ -131,7 +150,7 @@ void taskLED(void *pvParameters) {
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
-      bool ready = sensorData.gnssReady;
+      bool ready = Data.gpsData.gnssReady;
 
       if (!ready && !wasReady) {
         led.setColor(COLOR_RED);
@@ -147,46 +166,50 @@ void taskLED(void *pvParameters) {
   }
 }
 
-/**
- * @brief Tarea que imprime en Serial los datos de los sensores.
- *
- * - Estado GNSS (fix o no).
- * - Latitud, longitud, altitud, velocidad.
- * - Datos de la IMU (aceleración y velocidades).
- *
- * @param pvParameters Parámetros de tarea (no usados).
- */
-void taskPrint (void *pvParameters) {
+// /**
+//  * @brief Tarea que imprime en Serial los datos de los sensores.
+//  *
+//  * - Estado GNSS (fix o no).
+//  * - Latitud, longitud, altitud, velocidad.
+//  * - Datos de la IMU (aceleración y velocidades).
+//  *
+//  * @param pvParameters Parámetros de tarea (no usados).
+//  */
+// void taskPrint (void *pvParameters) {
 
-  for (;;) {
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
-      Serial.print("GNSS Ready: ");
-      Serial.print(sensorData.gnssReady ? "YES" : "NO");
-      Serial.print(" | Lat: "); Serial.print(sensorData.latitude, 6);
-      Serial.print(" | Lng: "); Serial.print(sensorData.longitude, 6);
-      Serial.print(" | Alt: "); Serial.print(sensorData.altitude, 2);
-      Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2); 
-      Serial.print(" km/h | Vibraciones: "); Serial.print(sensorData.vibraciones, 2);
-      Serial.println(" m/s^2"); 
+//   for (;;) {
+//     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+//       Serial.print("GNSS Ready: ");
+//       Serial.print(sensorData.gnssReady ? "YES" : "NO");
+//       Serial.print(" | Lat: "); Serial.print(sensorData.latitude, 6);
+//       Serial.print(" | Lng: "); Serial.print(sensorData.longitude, 6);
+//       Serial.print(" | Alt: "); Serial.print(sensorData.altitude, 2);
+//       Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2); 
+//       Serial.print(" km/h | Vibraciones: "); Serial.print(sensorData.vibraciones, 2);
+//       Serial.println(" m/s^2"); 
 
-      xSemaphoreGive(dataMutex);
-    }
+//       xSemaphoreGive(dataMutex);
+//     }
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); // 1 Hz
-  }
-}
+//     vTaskDelay(pdMS_TO_TICKS(1000)); // 1 Hz
+//   }
+// }
 
 
 void taskSend (void *pvParameters) {
 
   for (;;) {
     if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10) == pdTRUE)) {
-      sendData(sensorData);
+      String msg = msgToJson(Data);
+      sendData(msg);
+
+      vTaskDelay(pdMS_TO_TICKS(500));
 
       xSemaphoreGive(dataMutex);
+      Serial.println("Datos enviados\n");
     }
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); 
+    vTaskDelay(pdMS_TO_TICKS(30000)); 
   }
 } 
 
@@ -211,19 +234,17 @@ void setup()
   Serial.println("Configuración MPU6050..");
   if (!imu.begin(&Wire, 0x68)) {
     Serial.println("Error. No se pudo encontrar un MPU6050 valido.");
-    while (true);
   }
-  Serial.println("MPU6050 OK");
 
   // ===== LED y ALARMA =====
   led.begin();
+  led.setColor(COLOR_BLUE);
   buzzer.begin();
 
   // ===== Mutex para proteger sensorData =====
   dataMutex = xSemaphoreCreateMutex();
   if (dataMutex == NULL) {
     Serial.println("Error: no se pudo crear el mutex.");
-    while (true);
   }
 
   // connect to wifi
@@ -234,7 +255,7 @@ void setup()
   xTaskCreatePinnedToCore(taskAlarm,   "Task Alarm",   2048, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(taskLED,     "Task LED",     2048, NULL, 1, NULL, 1);
   //xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); ------> debughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh|1
-  xTaskCreatePinnedToCore(taskSend,    "Task Send",   4096, NULL, 1, NULL, 0); 
+  xTaskCreatePinnedToCore(taskSend,    "Task Send",   8192, NULL, 1, NULL, 0); 
 
 }
 

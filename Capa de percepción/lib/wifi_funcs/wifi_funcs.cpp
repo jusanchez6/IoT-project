@@ -1,7 +1,9 @@
 #include <wifi_funcs.hpp>
 
-const char *ssid = "iPhone de Julián ";
-const char *password = "sanchez06";
+const char *ssid = "Margarita 2";
+const char *password = "m43420813s";
+
+#if !CLOUD_SERVER
 
 const char *mqtt_server = "raspberry.local";
 const int mqtt_port = 8883;
@@ -90,6 +92,91 @@ const char *client_key =
     "91UBK/Kn+zLedVoxE7ddCfvb\n"
     "-----END PRIVATE KEY-----\n";
 
+//==================================================================================
+// =============================== certifados Amazon ===============================
+//==================================================================================
+#elif CLOUD_SERVER
+const char *mqtt_server = "a1lcoy4gm8z6za-ats.iot.us-east-2.amazonaws.com";
+const int mqtt_port = 8883;
+const char *topic = "bike/mtls";
+
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
+
+const char *ca_cert =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"
+    "ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"
+    "b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n"
+    "MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\n"
+    "b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\n"
+    "ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\n"
+    "9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw\n"
+    "IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6\n"
+    "VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L\n"
+    "93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm\n"
+    "jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n"
+    "AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA\n"
+    "A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI\n"
+    "U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs\n"
+    "N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv\n"
+    "o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU\n"
+    "5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy\n"
+    "rqXRfboQnoZsG4q5WTP468SQvvG5\n"
+    "-----END CERTIFICATE-----\n";
+
+const char *client_cert =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDWTCCAkGgAwIBAgIUZR+EzpJWOSCkslkCiQofIct99jcwDQYJKoZIhvcNAQEL\n"
+    "BQAwTTFLMEkGA1UECwxCQW1hem9uIFdlYiBTZXJ2aWNlcyBPPUFtYXpvbi5jb20g\n"
+    "SW5jLiBMPVNlYXR0bGUgU1Q9V2FzaGluZ3RvbiBDPVVTMB4XDTI1MTAxODEzMjU1\n"
+    "OFoXDTQ5MTIzMTIzNTk1OVowHjEcMBoGA1UEAwwTQVdTIElvVCBDZXJ0aWZpY2F0\n"
+    "ZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM5IqVZdftwyZhipBV+C\n"
+    "uedpH0kspc2Bdx0j3Wp+J853SwmgWfQ+oxXdCIMmJRvlXIdxfXarIDqRpOC377EZ\n"
+    "HkfQDgA2tTmjQ+tFWa85LnmuUjcdFZTevCo67ZxdUoW0dzuYV+7pHnOuA2pin161\n"
+    "ZaSrXWtKyrzacK60h5xZY5X0hFHmxAr76c9AygVSO63SfkLiibtGq4JggiGccpcZ\n"
+    "yK72r+Flodv50/Zy9nKQiFm8At/wQxAiyB3faDH1eqn2BUvpo+Neo/GVjKjml3Oi\n"
+    "JXDwp0+qpWx/AsBpi3dxRBrzfwPsQm+0ZXEImrROnRPUAAkGzmw5NsclLXomYHS/\n"
+    "ZM0CAwEAAaNgMF4wHwYDVR0jBBgwFoAUxYbBafEY6V7pfSdUuddJn5QE5lwwHQYD\n"
+    "VR0OBBYEFPIubCCom/E3+KgS1CGNgHOrg2Z8MAwGA1UdEwEB/wQCMAAwDgYDVR0P\n"
+    "AQH/BAQDAgeAMA0GCSqGSIb3DQEBCwUAA4IBAQARFzXg4vzNQY8EIb17x2XRZBWs\n"
+    "5w1NAKh96SSNaFxzOR1soFBdsl7xvgxQCAJTl90eQL/v6c1agKRYZ6iSlwHMKgoJ\n"
+    "nhweiOPlQNE6NSZxrIxAGqgIuTOuQ8izVcKYjAgDux0JmLDmQgDa15iffOy0HvIk\n"
+    "6KDmZhhi+P6/VWtrBygDxrtxNEVl8yPsnvTqhiA6H7tmvSDYml9zw1MZAhpxDXmx\n"
+    "GD64v+6gVgZLd21MzRC80MlZUhLISADE19XRFr4SUZ9JDYVHx6lq8bDs4qUrk9XJ\n"
+    "sQ87ej0HnASMc1dhCTaJ0VYQ54O0ZbGQP3U3A2lbMYRPehnfA4/g5dzsFYa2\n"
+    "-----END CERTIFICATE-----\n";
+
+const char *client_key =
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "MIIEowIBAAKCAQEAzkipVl1+3DJmGKkFX4K552kfSSylzYF3HSPdan4nzndLCaBZ\n"
+    "9D6jFd0IgyYlG+Vch3F9dqsgOpGk4LfvsRkeR9AOADa1OaND60VZrzkuea5SNx0V\n"
+    "lN68KjrtnF1ShbR3O5hX7ukec64DamKfXrVlpKtda0rKvNpwrrSHnFljlfSEUebE\n"
+    "Cvvpz0DKBVI7rdJ+QuKJu0argmCCIZxylxnIrvav4WWh2/nT9nL2cpCIWbwC3/BD\n"
+    "ECLIHd9oMfV6qfYFS+mj416j8ZWMqOaXc6IlcPCnT6qlbH8CwGmLd3FEGvN/A+xC\n"
+    "b7RlcQiatE6dE9QACQbObDk2xyUteiZgdL9kzQIDAQABAoIBABl9PP9g+iX3TEpL\n"
+    "yFAu9Q21HZqLG8my76b4IYnhIMYQU4NS/wqBGuG+uCiMdBVoV/Ccg2ZAavERwg/K\n"
+    "aqG1etpgyPoZyHbgx6mwng5awHVkpuAMhfgpNZL6SRYDKgk/bWQ9xM/Ommas39sr\n"
+    "aInpXC/mxNpXGYoQa9AKmp8lJHsIzMGNbT9TPhHVANC7X3MGzj/ey2I3G9MUIhfo\n"
+    "KFMIAa+PUa5AXu91aqjWSfdWO5hkiIUtid/uc2CANl2bEoMZ5QCZPheyT/hE5uLa\n"
+    "pecCP/82JpBZ9NzC97H2O79Og/vfLrvZyBT0huYhdwJ0AKeY1/xg2W+F/4I12I41\n"
+    "IbM56cECgYEA+I7S02Z1sAAxnPXn994G7F1mtOKMqiOFhwe4LESy0/9PfZ9omm6o\n"
+    "4nGx+Lo/qrD1xWSmnyCZbNkr2C0eHPoGtdgxqfdmANCOrU+gOjba8ojwM5piuq1O\n"
+    "53Wm63EGb/3pQxG0l7RtCnnZ3hM36mQC6zw0gsE+cTmKNhdZyjhGipUCgYEA1HXP\n"
+    "gTcxJLiEYCef39bufkZwSOWLuRkOSGy1izM4tx5EFTAH3cRNpueLmnfBoXLm9kx/\n"
+    "umXCB0ZbtwjnzQWXrTMoXowLnYv6EHuOy/TCbNZ7z+ABQXgw6gKPGwNfyVpU8pJq\n"
+    "H3xZodIOxZwgBTVtk9g9Jwxtjnom/JGYjiHNm1kCgYANmLp9p/AuJYSRQn5i97lH\n"
+    "OsDAilgJgpHuVgTEHyntIN03UP4G3KDOakvDAGU1MCLxnlTjBYR/CM42MBmimia9\n"
+    "0cq9snPY/Y+geWeZZ6DIfacuG3blIU/cp3nvDSq9+5TD/3byiYMhfJLnbAO2BayH\n"
+    "M67nrCx/QxeFZ/eYcUWilQKBgGYpyIBgI9d+itkZ9LzUQ5ahFHlZOBjnvYCCFcI7\n"
+    "/TfA7AgsMnwnWxe5G95JW+jgscMaAgmFyQlqgcvAEob5+3ejs/PS7/rwRm0KnR3i\n"
+    "MmPXt228T55Fx2+fj2Tz+GmAcHy8fx9o0kkIE2Zert8SVADV6IIQbdYnUvv8nxkp\n"
+    "lA7xAoGBALgD1tP3zzqrHgNSA+BMxFWP0/NsO9mHSy6UlQFb5Ca9FCAk5X0SXKLI\n"
+    "frwMSZHO7lDySWNJ7c1W7ZcRDBT79I0pvVbWP/CXuLngQOim2MZm2sLhBoAODdpl\n"
+    "VwMMc0RsI6nzYkzhVPeVguj0IB+ZeK73wh8HrkUDHw1YHKMYie7U\n"
+    "-----END RSA PRIVATE KEY-----\n";
+#endif
+
 void ask_credentials(String &ssid, String &pass)
 {
     Serial.println("\nConfiguración WiFi:");
@@ -134,20 +221,23 @@ bool connect_to_wifi(const String &ssid, const String &pass)
         Serial.print("Dirección IP: ");
         Serial.println(WiFi.localIP());
         return true;
-    } else {
+    }
+    else
+    {
         Serial.println("\nError al conectar a WiFi.");
         return false;
     }
 }
 
-
-void setup_wifi() {
+void setup_wifi()
+{
     Serial.println();
     Serial.print("Cone3ctando a Wifi: ");
     Serial.println(ssid);
     WiFi.begin(ssid, password);
 
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED)
+    {
         delay(1000);
         Serial.print(".");
     }
@@ -156,15 +246,16 @@ void setup_wifi() {
     Serial.println(WiFi.localIP());
 
     init_communications();
-
 }
 
-void syncTime() {
+void syncTime()
+{
     configTime(0, 0, "time.google.com", "co.pool.ntp.org");
     Serial.print("Esperando sincronización NTP");
     time_t now = time(nullptr);
 
-    while (now < 8 * 3600 * 2) {
+    while (now < 8 * 3600 * 2)
+    {
         delay(500);
         Serial.print(".");
         now = time(nullptr);
@@ -173,53 +264,92 @@ void syncTime() {
     Serial.println("\nHora Sincronizada");
 }
 
-void reconnect () {
-    while (!client.connected()) {
+void reconnect()
+{
+    while (!client.connected())
+    {
         Serial.println("Conectando al broker MQTT...");
-        
-        if (client.connect("ESP32-Client")) {
+
+        if (client.connect("ESP32-Client"))
+        {
             Serial.println("Conectado");
-        } else {
+        }
+        else
+        {
             Serial.print("Fallo, rc=");
             Serial.print(client.state());
             Serial.println(" Reintentando en 5 segundos...");
             delay(5000);
         }
-
     }
 }
 
-void sendData(SensorData_t &sensor_data)
+String msgToJson(const Telemetry_t &data)
+{
+    JsonDocument doc;
+
+    doc["device_id"] = data.deviceId;
+    doc["timestamp"] = data.timeStamp;
+    doc["sequence_id"] = data.sequenceId;
+
+    // AQUI VA UNA ESTRUCTURA SOLO PARA EL GPS!!!
+
+    doc["gps"]["latitude"] = data.gpsData.latitude;
+    doc["gps"]["longitude"] = data.gpsData.longitude;
+    doc["gps"]["altitude"] = data.gpsData.altitude;
+    doc["gps"]["velocity"] = data.gpsData.velocity;
+    doc["gps"]["Hora local"] = data.gpsData.localTime;
+
+    // AQUI VA UNA ESTRUCTURA SOLO PARA LA IMU
+
+    doc["imu"]["accel_x"] = data.imuData.aX;
+    doc["imu"]["accel_y"] = data.imuData.aY;
+    doc["imu"]["accel_z"] = data.imuData.aZ;
+    doc["imu"]["gyro_x"] = data.imuData.gX;
+    doc["imu"]["gyro_y"] = data.imuData.gY;
+    doc["imu"]["gyro_z"] = data.imuData.gZ;
+    doc["imu"]["vibration"] = data.imuData.vibraciones;
+
+    doc["angles"]["roll_deg"] = data.anglesData.roll;
+    doc["angles"]["pitch_deg"] = data.anglesData.picht;
+
+    // ALERTAS
+
+    size_t estimated = measureJson(doc);
+    Serial.printf("Tamaño estimado JSON: %u bytes\n", estimated);
+
+    String out;
+    serializeJson(doc, out);
+
+    Serial.print("Tamaño JSON: ");
+    Serial.print(out.length());
+    Serial.println(" bytes");
+    return out;
+}
+
+void sendData(const String &data)
 {
     if (!client.connected())
         reconnect();
 
     client.loop();
 
-    StaticJsonDocument<200> doc;
+    bool ok = client.publish(topic, data.c_str());
 
-    doc["latitude"] = sensor_data.latitude;
-    doc["longitude"] = sensor_data.longitude;
-    doc["altitude"] = sensor_data.altitude;
-    doc["velocity"] = sensor_data.velocity;
-    doc["vibration"] = sensor_data.vibraciones;
-
-    char json_msg[200];
-    serializeJson(doc, json_msg);
-
-    client.publish(topic, json_msg);
-
-    
+    if (ok)
+        Serial.println("Publicación exitosa");
+    else
+        Serial.println("Error en publish()");
 }
 
 void init_communications()
-{    
+{
     syncTime();
 
     espClient.setCACert(ca_cert);
     espClient.setCertificate(client_cert);
     espClient.setPrivateKey(client_key);
     client.setServer(mqtt_server, mqtt_port);
-    
+
     reconnect();
 }
