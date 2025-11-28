@@ -1,6 +1,11 @@
 #if !defined(TYPES_HPP)
 #define TYPES_HPP
 
+typedef struct {
+    bool gnssReady;
+    bool connectionWifi;
+    bool connectionBroker;
+} flags_t;
 
 typedef struct
 {
