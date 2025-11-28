@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['update_0',['update',['../classGNSS.html#ac5c54df7ed3b930268c8d7752c101725',1,'GNSS::update()'],['../classIMU.html#ac5c54df7ed3b930268c8d7752c101725',1,'IMU::update()']]]
+  ['reconnect_0',['reconnect',['../wifi__funcs_8hpp.html#a2540d74153b6b26f0727af62b7b25bf4',1,'wifi_funcs.cpp']]]
 ];

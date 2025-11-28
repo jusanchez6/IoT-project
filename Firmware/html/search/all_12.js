@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['window_0',['Window',['../structimu__data__t.html#a768ca1a3036cf1c37e6726902455c35c',1,'imu_data_t']]]
+  ['velocity_0',['velocity',['../structgpsData__t.html#ac46e821ae08930cc9e257642e34275a3',1,'gpsData_t::velocity'],['../classGNSS.html#acd7f88328d98abee4dbbf325a462b943',1,'GNSS::velocity()']]],
+  ['vibraciones_1',['vibraciones',['../structimuData__t.html#ac1fda36d5c04bf98697438b34db4bad9',1,'imuData_t']]]
 ];

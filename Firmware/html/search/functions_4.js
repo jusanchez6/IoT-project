@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['imu_0',['IMU',['../classIMU.html#a37cbb60dc0c1efbb6cea039ab47d11b9',1,'IMU']]],
-  ['ischarging_1',['isCharging',['../classBATTERY.html#afd9964d0e4a774d7633a49fb59ef5de3',1,'BATTERY']]],
-  ['isready_2',['isReady',['../classGNSS.html#acbed040576a7a18e2d9c46b2f15e0162',1,'GNSS']]]
+  ['handlesanve_0',['handleSanve',['../wifi__funcs_8hpp.html#acb0b0467ebe4b76586b636ecb30d40a6',1,'wifi_funcs.hpp']]],
+  ['htmlpage_1',['htmlPage',['../wifi__funcs_8hpp.html#ac3d207b842c3d59f1097beb6ea36199a',1,'wifi_funcs.cpp']]]
 ];

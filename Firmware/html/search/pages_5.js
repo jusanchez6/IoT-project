@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['información_20del_20autor_0',['Información del Autor',['../index.html#author_sec',1,'']]],
-  ['introducción_1',['Introducción',['../index.html#intro_sec',1,'']]],
-  ['iot_2',['Documentación Capa de Percepción IoT',['../index.html',1,'']]],
-  ['iot_20perception_20layer_3',['ESP32-S3 IoT Perception Layer',['../md_README.html#autotoc_md0',1,'']]]
+  ['finales_0',['Notas Finales',['../index.html#notes_sec',1,'']]],
+  ['firmware_20biketracker_20—_20esp32_20s3_1',['Firmware BikeTracker — ESP32-S3',['../index.html',1,'']]],
+  ['flujo_20de_20inicio_2',['Flujo de Inicio',['../index.html#setup_sec',1,'']]],
+  ['formato_20de_20telemetría_3',['Formato de Telemetría',['../index.html#telemetry_sec',1,'']]],
+  ['freertos_4',['Tareas Principales (FreeRTOS)',['../index.html#tasks_sec',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['imu_0',['imu',['../main_8cpp.html#a047a89b0208974c18d5c49656240616a',1,'main.cpp']]]
+  ['flags_0',['flags',['../main_8cpp.html#ac199e178c45100d3c42a1f0374fab372',1,'main.cpp']]]
 ];

@@ -1,7 +1,10 @@
 var searchData=
 [
-  ['ejecución_0',['Ejecución',['../md_README.html#autotoc_md9',1,'']]],
-  ['en_20serial_1',['Salida en Serial',['../md_README.html#autotoc_md11',1,'']]],
-  ['esp32_20s3_20iot_20perception_20layer_2',['ESP32-S3 IoT Perception Layer',['../md_README.html#autotoc_md0',1,'']]],
-  ['estructura_20del_20proyecto_3',['Estructura del Proyecto',['../md_README.html#autotoc_md7',1,'']]]
+  ['de_20aprendizaje_0',['Objetivos de Aprendizaje',['../index.html#objectives_sec',1,'']]],
+  ['de_20inicio_1',['Flujo de Inicio',['../index.html#setup_sec',1,'']]],
+  ['de_20tareas_2',['Diagrama de Tareas',['../md_README.html#autotoc_md13',1,'']]],
+  ['de_20telemetría_3',['Formato de Telemetría',['../index.html#telemetry_sec',1,'']]],
+  ['del_20proyecto_4',['Estructura del Proyecto',['../md_README.html#autotoc_md7',1,'']]],
+  ['del_20sistema_5',['Arquitectura del Sistema',['../index.html#system_sec',1,'']]],
+  ['diagrama_20de_20tareas_6',['Diagrama de Tareas',['../md_README.html#autotoc_md13',1,'']]]
 ];

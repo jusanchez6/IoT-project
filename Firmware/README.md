@@ -1,153 +1,114 @@
 | Supported Targets | ESP32-S3 |
 | ----------------- | -------- |
+# Firmware BikeTracker — ESP32-S3
 
-# ESP32-S3 IoT Perception Layer
+## Introducción
 
-Este proyecto implementa un **sistema IoT de percepción** con un **ESP32-S3**, integrando varios sensores y actuadores bajo un modelo concurrente con **FreeRTOS**.
+El Firmware BikeTracker es un sistema embebido desarrollado sobre un ESP32-S3 DevKit, cuyo propósito es capturar información del entorno mediante sensores GNSS e IMU, procesarla localmente y transmitirla hacia la nube mediante WiFi y MQTT. El proyecto integra tareas concurrentes con FreeRTOS, un portal cautivo para configuración de red, retroalimentación visual con LED RGB, alarmas acústicas y un pipeline completo de generación de telemetría.
 
----
+Este firmware corresponde al segundo laboratorio de la asignatura de IoT, y busca que el estudiante entienda cómo la capa de percepción interactúa con la capa de red en una arquitectura IoT real.
 
-## Características
+## Características Principales
 
-- **GNSS (GPS)**  
-  - Obtención de posición (latitud/longitud), altitud y velocidad.
-  - Indicación de estado de fix (no fix / fix válido).
+- **Adquisición GNSS (GPS):**
+  - Latitud, longitud, altitud, velocidad y hora local
+  - Indicación de fix y disponibilidad de señal
 
-- **IMU (MPU6050)**  
-  - Lectura de aceleración en eje X.  
-  - Estimación de velocidad por integración.  
-  - Filtro de Kalman para velocidad.
+- **Adquisición IMU (MPU6050):**
+  - Aceleración lineal, velocidad angular
+  - Cálculo de vibraciones y ángulos (roll y pitch)
 
-- **LED RGB (NeoPixel)**  
-  - Indicador de estado GNSS:
-    - 🔴 Rojo: sin fix.  
-    - 🟢 Verde: fix adquirido (permanece verde).  
+- **Comunicación IoT:**
+  - Conexión a WiFi en modo estación
+  - Portal cautivo para ingresar credenciales
+  - Comunicación segura TLS (CA, certificado cliente, llave privada)
+  - Cliente MQTT para envío periódico de telemetría
 
-- **Buzzer / Alarma**  
-  - Activación si la velocidad GNSS excede el umbral (30 km/h).
+- **FreeRTOS:**
+  - Tareas independientes para GNSS, IMU, LED, alarma, envío de datos y monitoreo WiFi
+  - Mutex para proteger datos compartidos
 
-- **FreeRTOS**  
-  - Cada módulo corre en su propia tarea concurrente:
-    - `taskSensors`: adquisición de GNSS e IMU.  
-    - `taskAlarm`: control de buzzer.  
-    - `taskLED`: retroalimentación visual de GNSS.  
-    - `taskPrint`: impresión periódica en Serial.
+- **Actuadores:**
+  - LED RGB (indicador de estados WiFi/GNSS/Broker)
+  - Alarma sonora por vibraciones o velocidad umbral
 
----
+## Arquitectura del Sistema
 
-## 🛠️ Hardware
+El firmware se organiza en módulos independientes:
 
-- ESP32-S3 DevKit  
-- Módulo GNSS compatible (ej. NEO-6M, NEO-M8N) conectado vía UART  
-- IMU MPU6050 conectada por I²C  
-- LED RGB (WS2812 integrado o externo)  
-- Buzzer (GPIO digital)  
+- `gnss.hpp` - lectura y decodificación NMEA
+- `imu.hpp` - lectura de acelerómetros y giróscopos
+- `platform.hpp` - LED RGB y alarma
+- `wifi_funcs.hpp` - WiFi & MQTT: conexión, TLS, portal cautivo y envío de datos
+- `types.hpp` - Tipos de Datos: estructuras internas de telemetría
+- `main.cpp` - punto de entrada y configuración de tareas FreeRTOS
 
-### Conexiones sugeridas
-
-| Componente | GPIO ESP32-S3 | Notas |
-|------------|---------------|-------|
-| GNSS RX    | 17            | UART1 RX |
-| GNSS TX    | 18            | UART1 TX |
-| IMU SDA    | 45            | I²C SDA |
-| IMU SCL    | 35            | I²C SCL |
-| LED RGB    | 48            | WS2812 integrado |
-| Buzzer     | 10            | Salida digital |
-
----
-
-## Estructura del Proyecto
+Cada tarea FreeRTOS opera de manera concurrente y accede a datos protegidos mediante un mutex global.
 
 ```
-/src
-├── main.cpp                # Código principal con tareas FreeRTOS
-├──/lib
-|   ├──/gnss
-|   |   ├── gnss.hpp        # Clase GNSS
-|   |   └── gnss.cpp         
-|   ├──/imu
-|   |   ├── imu.hpp          # Clase IMU (MPU6050)
-|   |   └── imu.cpp
-|   └──/platform
-|       ├── platform.hpp     # Definiciones de LED, buzzer, etc.
-|       └── platform.cpp   
-|
-└──platformio.ini            # Gestor de librerias de Platformio
-
+┌───────────────────┐         ┌─────────────────────┐
+│     taskSensors   │───────▶│      Telemetry_t    │
+└───────────────────┘         │   (Data + Mutex)    │
+      ▲     ▲                 └─────────────────────┘
+      │     │                           ▲
+  GNSS/IMU  │                           │
+      │     │                           │
+      │     │                           │
+      ▼     ▼                           ▼
+┌────────────────┐          ┌───────────────────────┐
+│   taskAlarm    │          │      taskSend         │
+└────────────────┘          │   MQTT + mTLS + JSON  │
+                            └───────────────────────┘
 ```
 
----
+## Objetivos de Aprendizaje
 
-## Ejecución
+- Comprender la capa de percepción en una arquitectura IoT
+- Integrar sensores GNSS e IMU con un ESP32-S3
+- Utilizar FreeRTOS para gestionar múltiples tareas concurrentes
+- Implementar retroalimentación mediante LED y buzzer
+- Establecer comunicaciones seguras (TLS + MQTT)
+- Crear una interfaz de configuración mediante portal cautivo
 
-1. Clona este repositorio:
+## Tareas Principales (FreeRTOS)
 
-   ```bash
-   git clone git@github.com:jusanchez6/IoT-project.git
-   cd esp32-iot-perception
-    ```
+- **taskSensors:** Adquiere datos de GNSS e IMU y actualiza la estructura de telemetría
+- **taskAlarm:** Activa o desactiva la alarma según velocidad y vibraciones
+- **taskLED:** Indicador de estado basado en: WiFi → GNSS → Broker MQTT
+- **taskSend:** Convierte la telemetría a JSON y la envía por MQTT
+- **taskWiFiPortal:** Atiende el servidor web y el DNS del portal cautivo
+- **taskWifiMonitor:** Supervisa el estado de conexión a WiFi
 
-2. Abre el proyecto en **PlatformIO** o **Arduino IDE** con soporte para **ESP32-S3**.
+## Formato de Telemetría
 
-3. Conecta el ESP32-S3 y selecciona el puerto.
+La estructura principal utilizada para el envío de datos es `Telemetry_t` en `types.hpp`
 
-4. Compila y carga:
+Esta incluye:
 
-   ```bash
-   pio run --target upload
-   ```
+- Identificación del dispositivo
+- Timestamp y secuencia
+- Datos GNSS (posición, fix, velocidad, hora)
+- Datos IMU (aceleración, giroscopio, vibración)
+- Ángulos roll y pitch
 
-5. Abre el monitor serie:
+## Flujo de Inicio
 
-   ```bash
-   pio device monitor
-   ```
-
----
-
-## Salida en Serial
-
-Ejemplo de impresión en `taskPrint`:
-
-```
-GNSS Ready: YES | Lat: 6.251234 | Lng: -75.563456 | Alt: 1543.21 m | Vel: 12.34 km/h
-|| IMU AccX: 0.98 | Vel (measured): 1.23 | Vel (Kalman): 1.10
-```
-
----
-
-## Diagrama de Tareas
-
-```mermaid
-flowchart TD
-    A[taskSensors] -->|Actualiza datos| B[Mutex sensorData]
-    B --> C[taskAlarm]
-    B --> D[taskLED]
-    B --> E[taskPrint]
-    C -->|Activa buzzer| F[Buzzer]
-    D -->|Colores GNSS| G[LED RGB]
-```
-
----
-
-## Roadmap
-
-* [x] Integración GNSS
-* [x] Integración IMU
-* [x] Control LED y buzzer con FreeRTOS
-* [ ] Conexión WiFi y envío de datos a servidor IoT
-* [ ] Migración a UDP/TCP para comunicación con backend
-
----
+1. Inicialización de GNSS, IMU, LED y buzzer
+2. Creación de mutex
+3. Conexión a WiFi:
+   - Si falla, inicia AP + portal cautivo
+4. Si WiFi OK → inicializa TLS + MQTT
+5. Lanzamiento de las tareas FreeRTOS
 
 ## Autor
 
-**Julián Sánchez**
-15/09/2025
+- **Autor:** Julian Mauricio Sánchez Ceballos
+- **Asignatura:** IoT
+- **Fecha:** 15/09/2025
+- **Versión del Firmware:** 3.0
 
----
+## Notas Finales
 
-## Licencia
-
-Este proyecto se distribuye bajo la licencia **MIT**.
-
+- El proyecto se puede compilar mediante PlatformIO (Arduino Core ESP32-S3)
+- El código es de propósito académico y está diseñado para demostrar un pipeline completo de percepción y comunicación IoT
+- El archivo principal es: `main.cpp`

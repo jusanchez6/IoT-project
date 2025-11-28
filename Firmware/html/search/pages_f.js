@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['📅_20roadmap_0',['📅 Roadmap',['../md_README.html#autotoc_md15',1,'']]]
+  ['—_20esp32_20s3_0',['Firmware BikeTracker — ESP32-S3',['../index.html',1,'']]]
 ];

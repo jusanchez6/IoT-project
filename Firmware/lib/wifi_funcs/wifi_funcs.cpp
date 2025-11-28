@@ -1,8 +1,5 @@
 #include <wifi_funcs.hpp>
 
-const char *ssid = "iPhone de Julián ";
-const char *password = "sanchez06";
-
 Preferences prefs;
 WebServer server(80);
 DNSServer dns;
@@ -204,24 +201,6 @@ void ask_credentials(String &ssid, String &pass)
     }
 }
 
-void setup_wifi()
-{
-    Serial.println();
-    Serial.print("Cone3ctando a Wifi: ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.print(".");
-    }
-
-    Serial.print("\nWiFi conectado IP: ");
-    Serial.println(WiFi.localIP());
-
-    init_communications();
-}
 
 void syncTime()
 {
@@ -335,6 +314,8 @@ bool sendData(const String &data)
 void init_communications()
 {
     syncTime();
+
+
 
     espClient.setCACert(ca_cert);
     espClient.setCertificate(client_cert);

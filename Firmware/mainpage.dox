@@ -1,50 +1,136 @@
 /*!
-\mainpage Documentación Capa de Percepción IoT
+\mainpage Firmware BikeTracker — ESP32-S3  
 \section intro_sec Introducción
 
-Este proyecto corresponde al segundo laboratorio de la asignatura de **IoT**.  
-Su objetivo principal es reforzar conceptos fundamentales de programación en **sistemas embebidos**, mediante la implementación de un sistema de percepción que integra sensores, actuadores y multitarea con **FreeRTOS** sobre un **ESP32-S3**.  
+El Firmware BikeTracker es un sistema embebido desarrollado sobre un 
+ESP32-S3 DevKit, cuyo propósito es capturar información del entorno mediante 
+sensores GNSS e IMU, procesarla localmente y transmitirla hacia la nube mediante 
+WiFi y MQTT. El proyecto integra tareas concurrentes con FreeRTOS, un portal 
+cautivo para configuración de red, retroalimentación visual con LED RGB, 
+alarmas acústicas y un pipeline completo de generación de telemetría.
 
-El sistema implementa un flujo de adquisición de datos con **GNSS** e **IMU**, junto con retroalimentación visual mediante **LED RGB** y alarmas sonoras mediante un **buzzer**.  
-Además, este laboratorio busca mostrar cómo la capa de percepción dentro de una arquitectura IoT es capaz de capturar información del entorno y transmitirla a niveles superiores.
+Este firmware corresponde al segundo laboratorio de la asignatura de IoT, 
+y busca que el estudiante entienda cómo la capa de percepción interactúa con 
+la capa de red en una arquitectura IoT real.
+
+\section features_sec Características Principales
+
+- Adquisición GNSS (GPS):
+  - Latitud, longitud, altitud, velocidad y hora local.
+  - Indicación de fix y disponibilidad de señal.
+
+- Adquisición IMU (MPU6050):
+  - Aceleración lineal, velocidad angular.
+  - Cálculo de vibraciones y ángulos (roll y pitch).
+
+- Comunicación IoT:
+  - Conexión a WiFi en modo estación.
+  - Portal cautivo para ingresar credenciales.
+  - Comunicación segura TLS (CA, certificado cliente, llave privada).
+  - Cliente MQTT para envío periódico de telemetría.
+
+- FreeRTOS:
+  - Tareas independientes para GNSS, IMU, LED, alarma, envío de datos y monitoreo WiFi.
+  - Mutex para proteger datos compartidos.
+
+- Actuadores:
+  - LED RGB (indicador de estados WiFi/GNSS/Broker).
+  - Alarma sonora por vibraciones o velocidad umbral.
+
+\section system_sec Arquitectura del Sistema
+
+El firmware se organiza en módulos independientes:
+
+- \ref gnss.hpp "GNSS" — lectura y decodificación NMEA.
+- \ref imu.hpp "IMU" — lectura de acelerómetros y giróscopos.
+- \ref platform.hpp "Platform" — LED RGB y alarma.
+- \ref wifi_funcs.hpp "WiFi & MQTT" — conexión, TLS, portal cautivo y envío de datos.
+- \ref types.hpp "Tipos de Datos" — estructuras internas de telemetría.
+- \ref main.cpp "main.cpp" — punto de entrada y configuración de tareas FreeRTOS.
+
+Cada tarea FreeRTOS opera de manera concurrente y accede a datos protegidos mediante 
+un mutex global.
+
+\code
+┌───────────────────┐         ┌─────────────────────┐
+│     taskSensors   │───────▶│      Telemetry_t    │
+└───────────────────┘         │   (Data + Mutex)    │
+      ▲     ▲                 └─────────────────────┘
+      │     │                           ▲
+  GNSS/IMU  │                           │
+      │     │                           │
+      │     │                           │
+      ▼     ▼                           ▼
+┌────────────────┐          ┌───────────────────────┐
+│   taskAlarm    │          │      taskSend         │
+└────────────────┘          │   MQTT + mTLS + JSON  │
+                            └───────────────────────┘
+\endcode
 
 \section objectives_sec Objetivos de Aprendizaje
-- Comprender el papel de la **capa de percepción** dentro de una arquitectura IoT.
-- Integrar sensores de posicionamiento (**GNSS**) y movimiento (**IMU**).
-- Aplicar **FreeRTOS** para ejecutar tareas concurrentes en sistemas embebidos.
-- Implementar mecanismos de **retroalimentación** con actuadores (LED y buzzer).
-- Preparar una base sólida para la conexión con la capa de red (WiFi, protocolos IoT).
 
-\section details_sec Detalles del Programa
-- Cada **tarea FreeRTOS** maneja un aspecto independiente del sistema:
-  - `taskSensors`: adquisición de datos de GNSS e IMU.  
-  - `taskAlarm`: activación de la alarma según velocidad umbral.  
-  - `taskLED`: indicación visual del estado GNSS.  
-  - `taskPrint`: monitoreo por puerto serie.  
-- Se incluyen:
-  - Lectura de posición, altitud y velocidad por GNSS.
-  - Estimación de velocidad mediante IMU (integración y filtro Kalman).
-  - Retroalimentación visual con LED RGB.
-  - Alarma sonora activada por umbral de velocidad.
-- La documentación se genera con **Doxygen** para facilitar la lectura, comprensión y mantenimiento del código.
+- Comprender la capa de percepción en una arquitectura IoT.
+- Integrar sensores GNSS e IMU con un ESP32-S3.
+- Utilizar FreeRTOS para gestionar múltiples tareas concurrentes.
+- Implementar retroalimentación mediante LED y buzzer.
+- Establecer comunicaciones seguras (TLS + MQTT).
+- Crear una interfaz de configuración mediante portal cautivo.
 
-\section methodology_sec Metodología
-1. Se definieron los sensores y actuadores de la capa de percepción.  
-2. Se diseñó un esquema modular de tareas bajo FreeRTOS.  
-3. Se implementaron clases independientes para GNSS, IMU, LED y alarma.  
-4. Se validó el sistema con salidas en el puerto serie.  
-5. Se planifica una futura extensión para integración con la **capa de red** vía WiFi.
+\section tasks_sec Tareas Principales (FreeRTOS)
 
-\section author_sec Información del Autor
-- **Autor**: Julian Mauricio Sánchez Ceballos  
-- **Asignatura**: IoT  
-- **Fecha**: 15/09/2025  
-- **Versión**: 1.0  
+- taskSensors:
+  Adquiere datos de GNSS e IMU y actualiza la estructura de telemetría.
 
-\section notes_sec Notas
-- Se recomienda compilar el proyecto con **ESP-IDF** o **Arduino Core for ESP32-S3**.  
-- El código tiene un fin **académico** y está orientado al aprendizaje de IoT.  
-- El archivo principal de referencia es \ref main.cpp "main.cpp".  
+- taskAlarm:
+  Activa o desactiva la alarma según velocidad y vibraciones.
+
+- taskLED:
+  Indicador de estado basado en:
+  WiFi → GNSS → Broker MQTT.
+
+- taskSend:
+  Convierte la telemetría a JSON y la envía por MQTT.
+
+- taskWiFiPortal:
+  Atiende el servidor web y el DNS del portal cautivo.
+
+- taskWifiMonitor:
+  Supervisa el estado de conexión a WiFi.
+
+\section telemetry_sec Formato de Telemetría
+
+La estructura principal utilizada para el envío de datos es:
+
+- \ref Telemetry_t en \ref types.hpp
+
+Esta incluye:
+
+- Identificación del dispositivo.
+- Timestamp y secuencia.
+- Datos GNSS (posición, fix, velocidad, hora).
+- Datos IMU (aceleración, giroscopio, vibración).
+- Ángulos roll y pitch.
+
+\section setup_sec Flujo de Inicio
+
+1. Inicialización de GNSS, IMU, LED y buzzer.
+2. Creación de mutex.
+3. Conexión a WiFi:
+   - Si falla, inicia AP + portal cautivo.
+4. Si WiFi OK → inicializa TLS + MQTT.
+5. Lanzamiento de las tareas FreeRTOS.
+
+\section author_sec Autor
+
+- Autor: Julian Mauricio Sánchez Ceballos
+- Asignatura: IoT
+- Fecha: 15/09/2025
+- Versión del Firmware: 3.0
+
+\section notes_sec Notas Finales
+
+- El proyecto se puede compilar mediante PlatformIO (Arduino Core ESP32-S3).
+- El código es de propósito académico y está diseñado para demostrar un
+  pipeline completo de percepción y comunicación IoT.
+- El archivo principal es: \ref main.cpp "main.cpp".
 */
-
-

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gnss_0',['GNSS',['../classGNSS.html',1,'']]]
+  ['flags_5ft_0',['flags_t',['../structflags__t.html',1,'']]]
 ];
