@@ -26,8 +26,9 @@
 #include <platform.hpp>
 #include <types.hpp>
 
+flags_t flags;
 
-SemaphoreHandle_t dataMutex;          ///< Mutex para proteger acceso concurrente a sensorData
+SemaphoreHandle_t dataMutex; ///< Mutex para proteger acceso concurrente a sensorData
 
 Telemetry_t Data;
 // ======== GNSS =============
@@ -35,7 +36,7 @@ Telemetry_t Data;
 #define TX_PIN 18      ///< GPIO para la transmisión de datos al GNSS
 #define GNSS_BAUD 9600 ///< Tasa de baudios para la comunicación UART con el GNSS
 
-#define SPEED_THRESHOLD 30.0 
+#define SPEED_THRESHOLD 30.0
 
 GNSS gnss(Serial1, RX_PIN, TX_PIN, GNSS_BAUD); ///< Objeto GNSS
 
@@ -53,57 +54,56 @@ LED led(NUM_LEDS, LED_PIN); ///< Objeto LED RGB
 
 ALARM buzzer(ALARM_PIN); ///< Objeto buzzer/alarma
 
-
 // ============= TAREAS FreeRTOS ===============================
 
 /**
  * @brief Tarea que lee GNSS e IMU y guarda datos en la estructura compartida.
- * 
+ *
  * - Actualiza el estado del GNSS (posición, altitud, velocidad).
  * - Lee aceleración y calcula velocidades desde la IMU.
  * - Copia la información en la variable global @ref sensorData protegida por un mutex.
  *
  * @param pvParameters Parámetros de tarea (no usados).
  */
-void taskSensors(void *pvParameters) {
+void taskSensors(void *pvParameters)
+{
 
   Telemetry_t temp; // temporal
 
-  for (;;) {
-    
+  for (;;)
+  {
 
     // === TELEMETRIA ====
     temp.timeStamp = millis();
     temp.sequenceId += 1;
 
-
     // === GNSS ===
     gnss.update();
-    temp.gpsData.gnssReady  = gnss.isReady();
-    temp.gpsData.latitude   = gnss.latitude();
-    temp.gpsData.longitude  = gnss.longitude();
-    temp.gpsData.altitude   = gnss.altitude();
-    temp.gpsData.velocity   = gnss.velocity();
-    temp.gpsData.localTime  = gnss.localTime();
+    temp.gpsData.gnssReady = gnss.isReady();
+    temp.gpsData.latitude = gnss.latitude();
+    temp.gpsData.longitude = gnss.longitude();
+    temp.gpsData.altitude = gnss.altitude();
+    temp.gpsData.velocity = gnss.velocity();
+    temp.gpsData.localTime = gnss.localTime();
 
     // === IMU ===
     imu.update();
 
-    temp.imuData.vibraciones  = imu.getVibRMS();
-    temp.imuData.aX           = imu.getAccX();
-    temp.imuData.aY           = imu.getAccY();
-    temp.imuData.aZ           = imu.getAccZ();
+    temp.imuData.vibraciones = imu.getVibRMS();
+    temp.imuData.aX = imu.getAccX();
+    temp.imuData.aY = imu.getAccY();
+    temp.imuData.aZ = imu.getAccZ();
 
-    temp.imuData.gX           = imu.getGyroX();
-    temp.imuData.gY           = imu.getGyroY();
-    temp.imuData.gZ           = imu.getGyroZ();
+    temp.imuData.gX = imu.getGyroX();
+    temp.imuData.gY = imu.getGyroY();
+    temp.imuData.gZ = imu.getGyroZ();
 
-    temp.anglesData.picht     = imu.getPitch();
-    temp.anglesData.roll      = imu.getRoll();
-    
+    temp.anglesData.picht = imu.getPitch();
+    temp.anglesData.roll = imu.getRoll();
 
     // === Copiar datos a la estructura compartida ===
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE)
+    {
       Data = temp;
       xSemaphoreGive(dataMutex);
     }
@@ -120,13 +120,19 @@ void taskSensors(void *pvParameters) {
  *
  * @param pvParameters Parámetros de tarea (no usados).
  */
-void taskAlarm(void *pvParameters) {
-  
-  for (;;) {
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE){
-      if (Data.gpsData.gnssReady && Data.gpsData.velocity > SPEED_THRESHOLD) {
+void taskAlarm(void *pvParameters)
+{
+
+  for (;;)
+  {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE)
+    {
+      if (Data.gpsData.gnssReady && Data.gpsData.velocity > SPEED_THRESHOLD)
+      {
         buzzer.turnOnAlarm();
-      } else {
+      }
+      else
+      {
         buzzer.turnOffAlarm();
       }
 
@@ -134,7 +140,6 @@ void taskAlarm(void *pvParameters) {
     }
     vTaskDelay(pdMS_TO_TICKS(500));
   }
-
 }
 
 /**
@@ -145,18 +150,28 @@ void taskAlarm(void *pvParameters) {
  *
  * @param pvParameters Parámetros de tarea (no usados).
  */
-void taskLED(void *pvParameters) {
+void taskLED(void *pvParameters)
+{
   bool wasReady = false; ///< Estado previo del GN0SS
 
-  for (;;) {
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+  for (;;)
+  {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10)) == pdTRUE)
+    {
       bool ready = Data.gpsData.gnssReady;
 
-      if (!ready && !wasReady) {
+      if (!ready && !wasReady)
+      {
         led.setColor(COLOR_RED);
-      } else if (ready && !wasReady) {
+      }
+      else if ((ready && !wasReady) | flags.connectionBroker)
+      {
         led.setColor(COLOR_GREEN);
       }
+      else if (!flags.connectionBroker)
+      {
+        led.setColor(COLOR_MUSTARD);
+      } 
 
       wasReady = ready; // actualizar estado previo
       xSemaphoreGive(dataMutex);
@@ -184,9 +199,9 @@ void taskLED(void *pvParameters) {
 //       Serial.print(" | Lat: "); Serial.print(sensorData.latitude, 6);
 //       Serial.print(" | Lng: "); Serial.print(sensorData.longitude, 6);
 //       Serial.print(" | Alt: "); Serial.print(sensorData.altitude, 2);
-//       Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2); 
+//       Serial.print(" m | Vel: "); Serial.print(sensorData.velocity, 2);
 //       Serial.print(" km/h | Vibraciones: "); Serial.print(sensorData.vibraciones, 2);
-//       Serial.println(" m/s^2"); 
+//       Serial.println(" m/s^2");
 
 //       xSemaphoreGive(dataMutex);
 //     }
@@ -195,23 +210,42 @@ void taskLED(void *pvParameters) {
 //   }
 // }
 
+void taskSend(void *pvParameters)
+{
 
-void taskSend (void *pvParameters) {
-
-  for (;;) {
-    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10) == pdTRUE)) {
+  for (;;)
+  {
+    if (xSemaphoreTake(dataMutex, pdMS_TO_TICKS(10) == pdTRUE))
+    {
       String msg = msgToJson(Data);
-      sendData(msg);
+      flags.connectionBroker = sendData(msg);
 
       vTaskDelay(pdMS_TO_TICKS(500));
 
       xSemaphoreGive(dataMutex);
-      Serial.println("Datos enviados\n");
+      if (!flags.connectionBroker)
+      {
+        Serial.println("Datos no enviados.\n");
+      }
+      else
+      {
+        Serial.println("Datos enviados.\n");
+      }
     }
 
-    vTaskDelay(pdMS_TO_TICKS(30000)); 
+    vTaskDelay(pdMS_TO_TICKS(30000));
   }
-} 
+}
+
+void taskWiFiPortal(void *pvParameters)
+{
+  for (;;)
+  {
+    dns.processNextRequest();
+    server.handleClient();
+    vTaskDelay(pdMS_TO_TICKS(5)); // evitamos watchdog
+  }
+}
 
 /**
  * @brief Configuración inicial del sistema.
@@ -223,43 +257,54 @@ void taskSend (void *pvParameters) {
 void setup()
 {
   Serial.begin(115200);
-  Wire.begin(45, 35); // Pines ESP32-S3 SDA=45, SCL=35
+  Wire.begin(45, 35);
 
   // ===== GNSS =====
   gnss.begin();
-  Serial.println("Iniciando GPS test...");
+  Serial.println("Iniciando GPS...");
   delay(2000);
 
   // ===== IMU =====
-  Serial.println("Configuración MPU6050..");
-  if (!imu.begin(&Wire, 0x68)) {
-    Serial.println("Error. No se pudo encontrar un MPU6050 valido.");
-  }
+  Serial.println("Configurando MPU6050...");
+  imu.begin(&Wire, 0x68);
 
-  // ===== LED y ALARMA =====
+  // ===== LED y Buzzer =====
   led.begin();
   led.setColor(COLOR_BLUE);
   buzzer.begin();
 
-  // ===== Mutex para proteger sensorData =====
+  // ===== Mutex =====
   dataMutex = xSemaphoreCreateMutex();
-  if (dataMutex == NULL) {
-    Serial.println("Error: no se pudo crear el mutex.");
+
+  // ===== WIFI: integrar tus funciones =====
+  Serial.println("\n=== Inicio del sistema ===");
+  if (!connectToWiFi())
+  {
+    Serial.println("===================Iniciando modo configuración (AP + portal cautivo) =================== \n");
+    startAP();
+
+    xTaskCreatePinnedToCore(taskWiFiPortal,
+                            "WiFi Portal",
+                            4096,
+                            NULL,
+                            1,
+                            NULL,
+                            0);
+  }
+  else
+  {
+    Serial.println("Iniciando Comunicación con el broker MQTT...\n");
+    init_communications();
   }
 
-  // connect to wifi
-  setup_wifi();
-
-  // ===== Crear tareas =====
+  // ===== Tareas =====
   xTaskCreatePinnedToCore(taskSensors, "Task Sensors", 4096, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(taskAlarm,   "Task Alarm",   2048, NULL, 1, NULL, 1);
-  xTaskCreatePinnedToCore(taskLED,     "Task LED",     2048, NULL, 1, NULL, 1);
-  //xTaskCreatePinnedToCore(taskPrint,   "Task Print",   2048, NULL, 1, NULL, 0); ------> debughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh|1
-  xTaskCreatePinnedToCore(taskSend,    "Task Send",   8192, NULL, 1, NULL, 0); 
-
+  xTaskCreatePinnedToCore(taskAlarm, "Task Alarm", 2048, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(taskLED, "Task LED", 2048, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(taskSend, "Task Send", 8192, NULL, 1, NULL, 0);
 }
 
 /**
  * @brief Bucle principal (no utilizado en FreeRTOS).
  */
-void loop () {}
+void loop() {}
