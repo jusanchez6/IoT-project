@@ -1,0 +1,50 @@
+/*!
+\mainpage Documentación Capa de Percepción IoT
+\section intro_sec Introducción
+
+Este proyecto corresponde al segundo laboratorio de la asignatura de **IoT**.  
+Su objetivo principal es reforzar conceptos fundamentales de programación en **sistemas embebidos**, mediante la implementación de un sistema de percepción que integra sensores, actuadores y multitarea con **FreeRTOS** sobre un **ESP32-S3**.  
+
+El sistema implementa un flujo de adquisición de datos con **GNSS** e **IMU**, junto con retroalimentación visual mediante **LED RGB** y alarmas sonoras mediante un **buzzer**.  
+Además, este laboratorio busca mostrar cómo la capa de percepción dentro de una arquitectura IoT es capaz de capturar información del entorno y transmitirla a niveles superiores.
+
+\section objectives_sec Objetivos de Aprendizaje
+- Comprender el papel de la **capa de percepción** dentro de una arquitectura IoT.
+- Integrar sensores de posicionamiento (**GNSS**) y movimiento (**IMU**).
+- Aplicar **FreeRTOS** para ejecutar tareas concurrentes en sistemas embebidos.
+- Implementar mecanismos de **retroalimentación** con actuadores (LED y buzzer).
+- Preparar una base sólida para la conexión con la capa de red (WiFi, protocolos IoT).
+
+\section details_sec Detalles del Programa
+- Cada **tarea FreeRTOS** maneja un aspecto independiente del sistema:
+  - `taskSensors`: adquisición de datos de GNSS e IMU.  
+  - `taskAlarm`: activación de la alarma según velocidad umbral.  
+  - `taskLED`: indicación visual del estado GNSS.  
+  - `taskPrint`: monitoreo por puerto serie.  
+- Se incluyen:
+  - Lectura de posición, altitud y velocidad por GNSS.
+  - Estimación de velocidad mediante IMU (integración y filtro Kalman).
+  - Retroalimentación visual con LED RGB.
+  - Alarma sonora activada por umbral de velocidad.
+- La documentación se genera con **Doxygen** para facilitar la lectura, comprensión y mantenimiento del código.
+
+\section methodology_sec Metodología
+1. Se definieron los sensores y actuadores de la capa de percepción.  
+2. Se diseñó un esquema modular de tareas bajo FreeRTOS.  
+3. Se implementaron clases independientes para GNSS, IMU, LED y alarma.  
+4. Se validó el sistema con salidas en el puerto serie.  
+5. Se planifica una futura extensión para integración con la **capa de red** vía WiFi.
+
+\section author_sec Información del Autor
+- **Autor**: Julian Mauricio Sánchez Ceballos  
+- **Asignatura**: IoT  
+- **Fecha**: 15/09/2025  
+- **Versión**: 1.0  
+
+\section notes_sec Notas
+- Se recomienda compilar el proyecto con **ESP-IDF** o **Arduino Core for ESP32-S3**.  
+- El código tiene un fin **académico** y está orientado al aprendizaje de IoT.  
+- El archivo principal de referencia es \ref main.cpp "main.cpp".  
+*/
+
+
